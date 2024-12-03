@@ -3,4 +3,3 @@
 .idea
 /config/development/
 /vendor/
-composer.lock

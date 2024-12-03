@@ -3,7 +3,7 @@
 namespace components;
 
 use helpers\Validation;
-use PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\PHPMailer;
 
 /**
  * PHPMailer facade
@@ -180,7 +180,7 @@ class Email
 
             try {
                 $output = $this->_send();
-            } catch (\PHPMailer\Exception $e) {
+            } catch (\PHPMailer\PHPMailer\Exception $e) {
                 \core\Debug::var_dump($e->getMessage());
             }
         }
@@ -207,7 +207,7 @@ class Email
     /**
      * Send email
      * @return bool
-     * @throws \PHPMailer\Exception
+     * @throws \PHPMailer\PHPMailer\Exception
      */
     private function _send(): bool
     {

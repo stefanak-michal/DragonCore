@@ -18,9 +18,6 @@ $aConfig = array(
 
 );
 
-// Neo4j wrapper default configuration
-Neo4j::$auth = \Bolt\helpers\Auth::basic('neo4j', 'neo4j');
-
 if (IS_WORKSPACE) {
     Neo4j::$logHandler = function (string $query, array $params = [], int $executionTime = 0, array $statistics = []) {
         $st = '';

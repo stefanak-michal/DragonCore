@@ -84,7 +84,7 @@ class Assets
      * @param string $name
      * @return string
      */
-    private static function generateUrl(string $name): string
+    public static function generateUrl(string $name): string
     {
         //auto add "min" on production if the file is available
         if (!IS_WORKSPACE && strpos($name, '.min.') === false) {
