@@ -12,7 +12,6 @@
         "ext-curl": "*",
         "stefanak-michal/meekrodb": "*",
         "stefanak-michal/bolt": "*",
-        "stefanak-michal/neo4j-bolt-wrapper": "*",
         "phpmailer/phpmailer": "^6"
     },
     "support": {
