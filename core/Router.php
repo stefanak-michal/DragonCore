@@ -55,7 +55,6 @@ final class Router
      */
     public function __construct()
     {
-        $this->parseControllerRoutes();
         $this->loadRoutes();
 
         $this->project_host = Config::gi()->get('project_host');
@@ -91,57 +90,6 @@ final class Router
                     $value = 'controllers/' . $value;
 
                 $this->routes[$key] = $value;
-            }
-        }
-    }
-
-    /**
-     * Load routes from controllers files as @route annotation for public methods
-     */
-    private function parseControllerRoutes()
-    {
-        if (!Config::gi()->get('parseControllerRoutes', false))
-            return;
-
-        $dir = new \RecursiveDirectoryIterator(BASE_PATH . DS . 'controllers');
-        $iterator = new \RecursiveIteratorIterator($dir);
-        $regex = new \RegexIterator($iterator, '/^.+\.php$/i', \RegexIterator::GET_MATCH);
-
-        foreach($regex as $file) {
-            $file = $file[0];
-
-            if (strpos(file_get_contents($file), '@route') === false)
-                continue;
-
-            $ns = null;
-            $routes = [];
-            $cls = null;
-            foreach (file($file) as $line) {
-                if (strpos($line, 'namespace') !== false) {
-                    $ns = trim(str_replace('namespace', '', $line), " ;\r\n") . '/';
-                    $ns = str_replace("\\", "/", $ns);
-                    continue;
-                }
-
-                $match = [];
-                if (!empty($ns) && strpos($line, 'class') !== false && preg_match("/class\s+(\w+)/", $line, $match)) {
-                    $cls = $ns . trim($match[1]);
-                    continue;
-                }
-
-                if (strpos($line, '@route') !== false) {
-                    $parts = explode(' ', $line);
-                    $parts = array_values(array_filter($parts));
-                    $routes[] = trim($parts[2]);
-                    continue;
-                }
-
-                $match = [];
-                if (!empty($routes) && !empty($cls) && preg_match("/public function (\w+)/", $line, $match)) {
-                    foreach ($routes as $route)
-                        $this->routes[$route] = $cls . '/' . $match[1];
-                    $routes = [];
-                }
             }
         }
     }
