@@ -79,7 +79,7 @@ final class Dragon
 
         $pipeline = array_reduce(
             array_reverse($middlewares),
-            function (callable $carry, IMiddleware $middleware) {
+            function (callable $carry, \middleware\IMiddleware $middleware) {
                 return function () use ($middleware, $carry) {
                     $middleware->handle($carry);
                 };

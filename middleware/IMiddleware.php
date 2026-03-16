@@ -1,11 +1,11 @@
 <?php
 
-namespace core;
+namespace middleware;
 
 /**
  * Interface IMiddleware
  *
- * @package core
+ * @package middleware
  * @author Michal Stefanak
  * @link https://github.com/stefanak-michal/DragonMVC
  */

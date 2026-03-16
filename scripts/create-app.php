@@ -158,7 +158,7 @@ namespace middleware;
  * Renders the view after the controller action
  * @package middleware
  */
-class RenderMiddleware implements \core\IMiddleware
+class RenderMiddleware implements \middleware\IMiddleware
 {
 
     public function handle(callable $next): void
