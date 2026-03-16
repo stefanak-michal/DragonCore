@@ -8,10 +8,10 @@
     "license": "MIT",
     "minimum-stability": "stable",
     "require": {
-        "php": ">=7.4",
+        "php": "^8.5",
         "ext-curl": "*",
         "stefanak-michal/meekrodb": "*",
-        "stefanak-michal/bolt": "*",
+        "stefanak-michal/bolt": "^7.4",
         "phpmailer/phpmailer": "^6"
     },
     "support": {

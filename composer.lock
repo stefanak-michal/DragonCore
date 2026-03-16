@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f21c42e0114f802d8bc8c6779e842405",
+    "content-hash": "fa206dad4c8ce56c8550175b539bc58c",
     "packages": [
         {
             "name": "phpmailer/phpmailer",
-            "version": "v6.9.3",
+            "version": "v6.12.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPMailer/PHPMailer.git",
-                "reference": "2f5c94fe7493efc213f643c23b1b1c249d40f47e"
+                "reference": "d1ac35d784bf9f5e61b424901d5a014967f15b12"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/2f5c94fe7493efc213f643c23b1b1c249d40f47e",
-                "reference": "2f5c94fe7493efc213f643c23b1b1c249d40f47e",
+                "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/d1ac35d784bf9f5e61b424901d5a014967f15b12",
+                "reference": "d1ac35d784bf9f5e61b424901d5a014967f15b12",
                 "shasum": ""
             },
             "require": {
@@ -77,7 +77,7 @@
             "description": "PHPMailer is a full-featured email creation and transfer class for PHP",
             "support": {
                 "issues": "https://github.com/PHPMailer/PHPMailer/issues",
-                "source": "https://github.com/PHPMailer/PHPMailer/tree/v6.9.3"
+                "source": "https://github.com/PHPMailer/PHPMailer/tree/v6.12.0"
             },
             "funding": [
                 {
@@ -85,7 +85,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-11-24T18:04:13+00:00"
+            "time": "2025-10-15T16:49:08+00:00"
         },
         {
             "name": "psr/simple-cache",
@@ -140,16 +140,16 @@
         },
         {
             "name": "stefanak-michal/bolt",
-            "version": "v7.1.6",
+            "version": "v7.4.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/neo4j-php/Bolt.git",
-                "reference": "0c229b6c0094a91a0ad1467911353d048978fdf9"
+                "url": "https://github.com/stefanak-michal/php-bolt-driver.git",
+                "reference": "17eb21312bad0a1d006d5e428acc01bdf4b6ed65"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/neo4j-php/Bolt/zipball/0c229b6c0094a91a0ad1467911353d048978fdf9",
-                "reference": "0c229b6c0094a91a0ad1467911353d048978fdf9",
+                "url": "https://api.github.com/repos/stefanak-michal/php-bolt-driver/zipball/17eb21312bad0a1d006d5e428acc01bdf4b6ed65",
+                "reference": "17eb21312bad0a1d006d5e428acc01bdf4b6ed65",
                 "shasum": ""
             },
             "require": {
@@ -163,9 +163,7 @@
             },
             "suggest": {
                 "ext-openssl": "Needed when using StreamSocket connection class with SSL",
-                "ext-sockets": "Needed when using Socket connection class",
-                "laudis/neo4j-php-client": "Neo4j-PHP-Client is the most advanced PHP Client for Neo4j",
-                "stefanak-michal/neo4j-bolt-wrapper": "Wrapper for Neo4j PHP Bolt library to simplify usage."
+                "ext-sockets": "Needed when using Socket connection class"
             },
             "type": "library",
             "autoload": {
@@ -185,17 +183,21 @@
                 }
             ],
             "description": "PHP library to provide connectivity to graph database over TCP socket with Bolt specification",
-            "homepage": "https://github.com/neo4j-php/Bolt",
+            "homepage": "https://github.com/stefanak-michal/php-bolt-driver",
             "keywords": [
                 "Socket",
                 "bolt",
                 "database",
-                "neo4j"
+                "driver",
+                "graph",
+                "memgraph",
+                "neo4j",
+                "tcp"
             ],
             "support": {
                 "docs": "https://www.neo4j.com/docs/bolt/current/",
-                "issues": "https://github.com/neo4j-php/Bolt/issues",
-                "source": "https://github.com/neo4j-php/Bolt"
+                "issues": "https://github.com/stefanak-michal/php-bolt-driver/issues",
+                "source": "https://github.com/stefanak-michal/php-bolt-driver"
             },
             "funding": [
                 {
@@ -203,34 +205,30 @@
                     "type": "ko-fi"
                 }
             ],
-            "time": "2024-12-03T19:05:38+00:00"
+            "time": "2026-03-16T11:23:29+00:00"
         },
         {
             "name": "stefanak-michal/meekrodb",
-            "version": "v3.0.1",
+            "version": "v2.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/stefanak-michal/meekrodb.git",
-                "reference": "5d71a03252c056e4874ffb0bbe69f7198754ce15"
+                "reference": "e30c240d54bc81f58c58507a9ed768032eb494a5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/stefanak-michal/meekrodb/zipball/5d71a03252c056e4874ffb0bbe69f7198754ce15",
-                "reference": "5d71a03252c056e4874ffb0bbe69f7198754ce15",
+                "url": "https://api.github.com/repos/stefanak-michal/meekrodb/zipball/e30c240d54bc81f58c58507a9ed768032eb494a5",
+                "reference": "e30c240d54bc81f58c58507a9ed768032eb494a5",
                 "shasum": ""
             },
             "require": {
-                "ext-mysqli": "*",
-                "php": ">=7.1.0"
-            },
-            "provide": {
-                "sergeytsalkov/meekrodb": "*"
+                "php": ">=5.3.0"
             },
             "type": "library",
             "autoload": {
-                "psr-4": {
-                    "MeekroDB\\": "src/"
-                }
+                "classmap": [
+                    "db.class.php"
+                ]
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -240,11 +238,6 @@
                 {
                     "name": "Sergey Tsalkov",
                     "email": "stsalkov@gmail.com"
-                },
-                {
-                    "name": "Michal Stefanak",
-                    "homepage": "https://www.linkedin.com/in/michalstefanak/",
-                    "role": "Developer"
                 }
             ],
             "description": "The Simple PHP/MySQL Library",
@@ -256,72 +249,17 @@
                 "pdo"
             ],
             "support": {
-                "docs": "https://meekro.com/",
+                "email": "support@meekro.com",
                 "issues": "https://github.com/stefanak-michal/meekrodb/issues",
-                "source": "https://github.com/stefanak-michal/meekrodb/tree/v3.0.1"
+                "source": "https://github.com/stefanak-michal/meekrodb/tree/v2.4"
             },
             "funding": [
                 {
                     "url": "https://ko-fi.com/michalstefanak",
-                    "type": "ko-fi"
+                    "type": "ko_fi"
                 }
             ],
-            "time": "2022-11-07T05:17:53+00:00"
-        },
-        {
-            "name": "stefanak-michal/neo4j-bolt-wrapper",
-            "version": "v2.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/stefanak-michal/neo4j-bolt-wrapper.git",
-                "reference": "7a683c64d34bacc27a2927d3f5163a2c23fc6b02"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/stefanak-michal/neo4j-bolt-wrapper/zipball/7a683c64d34bacc27a2927d3f5163a2c23fc6b02",
-                "reference": "7a683c64d34bacc27a2927d3f5163a2c23fc6b02",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^8.1",
-                "stefanak-michal/bolt": "^7"
-            },
-            "type": "library",
-            "autoload": {
-                "files": [
-                    "src/Neo4j.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Michal Stefanak",
-                    "homepage": "https://www.linkedin.com/in/michalstefanak/",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Wrapper for Neo4j over PHP Bolt library to simplify usage.",
-            "homepage": "https://github.com/stefanak-michal/neo4j-bolt-wrapper",
-            "keywords": [
-                "Socket",
-                "bolt",
-                "database",
-                "neo4j"
-            ],
-            "support": {
-                "issues": "https://github.com/stefanak-michal/neo4j-bolt-wrapper/issues",
-                "source": "https://github.com/stefanak-michal/neo4j-bolt-wrapper"
-            },
-            "funding": [
-                {
-                    "url": "https://ko-fi.com/michalstefanak",
-                    "type": "ko-fi"
-                }
-            ],
-            "time": "2024-12-03T19:06:40+00:00"
+            "time": "2021-06-29T04:31:23+00:00"
         }
     ],
     "packages-dev": [],
@@ -331,9 +269,9 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=7.4",
+        "php": "^8.5",
         "ext-curl": "*"
     },
     "platform-dev": {},
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.9.0"
 }

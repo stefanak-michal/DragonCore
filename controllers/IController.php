@@ -12,12 +12,9 @@ namespace controllers;
 interface IController
 {
     /**
-     * Method invoked before called method
+     * Return the middleware stack to be executed around the controller method
+     *
+     * @return \core\IMiddleware[]
      */
-    public function beforeMethod();
-
-    /**
-     * Method invoked after called method
-     */
-    public function afterMethod();
+    public function middleware(): array;
 }
