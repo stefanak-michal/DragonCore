@@ -14,7 +14,7 @@ interface IController
     /**
      * Return the middleware stack to be executed around the controller method
      *
-     * @return \core\IMiddleware[]
+     * @return \middleware\IMiddleware[]
      */
     public function middleware(): array;
 }
