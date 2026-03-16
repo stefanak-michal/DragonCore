@@ -64,7 +64,7 @@ final class Debug
                 var_dump($one);
                 $content = ob_get_clean();
 
-                self::$tables[__FUNCTION__][] = ['dump' => '<div class="collapsable">' . $content . '</div>' . '<div>' . self::backtrace() . '</div>'];
+                self::$tables[__FUNCTION__][] = ['dump' => '<details><summary>' . $content . '</summary>' . self::backtrace() . '</details>'];
             }
         }
     }
@@ -79,7 +79,7 @@ final class Debug
             return;
 
         $exists = file_exists($file);
-        $str = '<div class="collapsable ' . ($exists ? '' : 'red') . '">' . $file . '</div>' . '<div>' . self::backtrace() . '</div>';
+        $str = '<details><summary' . ($exists ? '' : ' class="red"') . '>' . $file . '</summary>' . self::backtrace() . '</details>';
 
         foreach ((self::$tables[__FUNCTION__] ?? []) as $i => $row) {
             if ($row['file'] == $str) {
@@ -108,7 +108,7 @@ final class Debug
             self::$timers[$key] = microtime(true);
         } else {
             self::$tables[__FUNCTION__][] = [
-                'key' => '<div class="collapsable">' . $key . '</div>' . '<div>' . self::backtrace() . '</div>',
+                'key' => '<details><summary>' . $key . '</summary>' . self::backtrace() . '</details>',
                 'time (msec)' => sprintf('%f', (microtime(true) - self::$timers[$key]) * 1000)
             ];
             unset(self::$timers[$key]);
@@ -126,10 +126,10 @@ final class Debug
         if (self::init())
             return;
 
-        $query = '<div class="collapsable">' . $query . '</div>';
+        $query = '<details><summary>' . $query . '</summary>';
 
         if (!empty($hidden)) {
-            $html = '<div><table style=" border-spacing: 0; ">';
+            $html = '<table style=" border-spacing: 0; ">';
 
             if (is_array(reset($hidden))) {
                 $html .= '<thead><tr>';
@@ -151,10 +151,12 @@ final class Debug
                 }
                 $html .= '</tr>';
             }
-            $html .= '</tbody></table></div>';
+            $html .= '</tbody></table>';
 
             $query .= $html;
         }
+
+        $query .= '</details>';
 
         self::$tables[__FUNCTION__][] = array_merge(['query' => $query], $otherColumns);
     }

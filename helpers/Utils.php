@@ -51,74 +51,6 @@ class Utils
     }
 
     /**
-     * Remove diacritic
-     * 
-     * @param string $text
-     * @param boolean $toLowerCase
-     * @return string
-     */
-    public static function removeDiacritic(string $text, bool $toLowerCase = false): string
-    {
-        // also for multi-byte (napr. UTF-8)
-        $transform = array(
-            'ö' => 'o',
-            'ű' => 'u',
-            'ő' => 'o',
-            'ü' => 'u',
-            'ł' => 'l',
-            'ż' => 'z',
-            'ń' => 'n',
-            'ć' => 'c',
-            'ę' => 'e',
-            'ś' => 's',
-            'ŕ' => 'r',
-            'á' => 'a',
-            'ä' => 'a',
-            'ĺ' => 'l',
-            'č' => 'c',
-            'é' => 'e',
-            'ě' => 'e',
-            'í' => 'i',
-            'ď' => 'd',
-            'ň' => 'n',
-            'ó' => 'o',
-            'ô' => 'o',
-            'ř' => 'r',
-            'ů' => 'u',
-            'ú' => 'u',
-            'š' => 's',
-            'ť' => 't',
-            'ž' => 'z',
-            'ľ' => 'l',
-            'ý' => 'y',
-            'Ŕ' => 'R',
-            'Á' => 'A',
-            'Ä' => 'A',
-            'Ĺ' => 'L',
-            'Č' => 'C',
-            'É' => 'E',
-            'Ě' => 'E',
-            'Í' => 'I',
-            'Ď' => 'D',
-            'Ň' => 'N',
-            'Ó' => 'O',
-            'Ô' => 'O',
-            'Ř' => 'R',
-            'Ů' => 'U',
-            'Ú' => 'U',
-            'Š' => 'S',
-            'Ť' => 'T',
-            'Ž' => 'Z',
-            'Ľ' => 'L',
-            'Ý' => 'Y',
-            'Ä' => 'A'
-        );
-
-        $text = strtr($text, $transform);
-        return $toLowerCase ? strtolower($text) : $text;
-    }
-
-    /**
      * Return size in bytes
      * 
      * @param string $val
@@ -198,22 +130,6 @@ class Utils
     }
     
     /**
-     * Create sef
-     * 
-     * @param string $val
-     * @return string
-     */
-    public static function makeSefString(string $val): string
-    {
-        $val = self::removeDiacritic($val, true);
-        $val = str_replace(array(' '), array('-'), $val);
-        $val = preg_replace("/-+/", '-', $val);
-        $val = preg_replace("/[^\w\-]/u", '', $val);
-        $val = trim($val, '-');
-        return iconv("UTF-8", "UTF-8//IGNORE", $val);
-    }
-    
-    /**
      * Return global variable
      * 
      * @param string $name
@@ -254,41 +170,9 @@ class Utils
         $response = curl_exec($ch);
         if (!(curl_getinfo($ch, CURLINFO_RESPONSE_CODE) == 200 && curl_errno($ch) == 0))
             $response = false;
-        curl_close($ch);
+        unset($ch);
 
         return $response;
-    }
-
-    /**
-     * Vrati referer
-     *
-     * @param ?\controllers\IController $controller
-     * @param string $method
-     * @param array $vars
-     */
-    public static function referer(?\controllers\IController &$controller = null, string &$method = '', array &$vars = [])
-    {
-        $ref = apache_request_headers()['Referer'] ?? '';
-        if (empty($ref))
-            return;
-        
-        $ref = str_ireplace(\core\Config::gi()->get('project_host'), '', $ref);
-        $ref = parse_url($ref, PHP_URL_PATH);
-        if (empty($ref))
-            return;
-        
-        $cmv = \core\Router::gi()->findRoute($ref);
-        if (empty($cmv))
-            return;
-
-        $last = ucfirst(array_pop($cmv['controller']));
-        $className = "\\" . implode("\\", $cmv['controller']) . "\\" . $last;
-        if (!class_exists($className))
-            trigger_error('Missing class ' . $className, E_USER_ERROR);
-
-        $method = $cmv['method'];
-        $vars = $cmv['vars'];
-        $controller = new $className();
     }
 
     /**

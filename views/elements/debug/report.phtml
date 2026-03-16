@@ -79,12 +79,11 @@
         display: block;
       }
 
-      .collapsable {
+      details summary {
         cursor: pointer;
       }
 
-      .collapsable + * {
-        display: none;
+      details > *:not(summary) {
         padding-left: 10px;
         margin-top: 10px;
       }
@@ -94,18 +93,15 @@
       }
     </style>
 
-    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
     <script>
-        $(document).ready(function () {
-            $("ul li").on("click", function () {
-                $("ul li, table").removeClass("active");
-                $(this).addClass("active");
-                $("table#" + $(this).data("tab")).addClass("active");
-            });
-
-            $("table .collapsable").on("click", function () {
-                $(this).next().slideToggle();
-            });
+        document.addEventListener("DOMContentLoaded", function () {
+            for (const li of document.querySelectorAll("ul li")) {
+                li.addEventListener("click", function () {
+                    document.querySelectorAll("ul li, table").forEach(el => el.classList.remove("active"));
+                    this.classList.add("active");
+                    document.getElementById(this.dataset.tab).classList.add("active");
+                });
+            }
         });
     </script>
 </head>

@@ -86,16 +86,8 @@
     color: gray;
   }
 
-  #dragon-debug > table td div.collapsable {
+  #dragon-debug > table td details summary {
     cursor: pointer;
-  }
-
-  #dragon-debug > table td div.collapsable + div {
-    display: none;
-  }
-
-  #dragon-debug > table td div.collapsable + div.active {
-    display: block;
   }
 </style>
 
@@ -122,12 +114,6 @@
             document.getElementById(key).className = current.className == "active" ? "" : "active";
         }
     };
-
-    for (e of document.getElementById("dragon-debug").getElementsByClassName("collapsable")) {
-        e.onclick = function () {
-            this.nextSibling.className = this.nextSibling.className == "active" ? "" : "active";
-        }
-    }
 
     document.getElementById("dragon-debug-close").onclick = function () {
         document.getElementById("dragon-debug").remove();
