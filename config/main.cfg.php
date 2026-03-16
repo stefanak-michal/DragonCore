@@ -15,11 +15,10 @@ $aConfig = array(
         'host' => 'localhost',
         'encoding' => 'utf8'
     ],
-
 );
 
 if (IS_WORKSPACE) {
-    \Bolt\helpers\Client::$logHandler = function (string $query, array $params = [], array $statistics = []) {
+    $aConfig['graphdb']['logHandler'] = function (string $query, array $params = [], array $statistics = []) {
         $st = '';
         foreach (array_filter($statistics) as $key => $value) {
             $st .= '<b>' . $key . ':</b> ' . $value . '<br>';
