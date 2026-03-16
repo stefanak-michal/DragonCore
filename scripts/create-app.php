@@ -39,6 +39,7 @@ $dirs = [
     'config' . DS . 'development',
     'controllers',
     'helpers',
+    'middleware',
     'models',
     'scripts',
     'vendor',
@@ -137,15 +138,34 @@ class Homepage implements IController
     {
         \core\View::gi()->set("msg", "Hello ' . basename(BASE_PATH) . '!");
     }
-    
-    public function beforeMethod()
+
+    public function middleware(): array
     {
- 
+        return [
+            new \middleware\RenderMiddleware(),
+        ];
     }
-    
-    public function afterMethod()
+}
+');
+
+//render middleware
+file_put_contents(BASE_PATH . DS . 'middleware' . DS . 'RenderMiddleware.php', '<?php
+
+namespace middleware;
+
+/**
+ * Class RenderMiddleware
+ * Renders the view after the controller action
+ * @package middleware
+ */
+class RenderMiddleware implements \core\IMiddleware
+{
+
+    public function handle(callable $next): void
     {
-        $content = \Core\View::gi()->render();
+        $next();
+
+        $content = \core\View::gi()->render();
         $pos = strrpos($content, "</body>");
         if (IS_WORKSPACE && $pos !== false)
             $content = substr_replace($content, \core\Debug::onsite(), $pos, 0);

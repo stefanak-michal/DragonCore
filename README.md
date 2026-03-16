@@ -22,4 +22,4 @@ _Logo designed by Freepik.com_
 
 Check [wiki](https://github.com/stefanak-michal/DragonMVC/wiki) for more informations.
 
-<a href='https://ko-fi.com/Z8Z5ABMLW' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://cdn.ko-fi.com/cdn/kofi1.png?v=3' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/Z8Z5ABMLW)

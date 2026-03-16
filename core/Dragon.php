@@ -65,23 +65,29 @@ final class Dragon
         //finally we have something to show
         $this->loadController($cmv);
 
-        if (method_exists(self::$controller, 'beforeMethod')) {
-            Debug::timer('beforeMethod');
-            self::$controller->beforeMethod();
-            Debug::timer('beforeMethod');
-        }
+        $middlewares = method_exists(self::$controller, 'middleware')
+            ? self::$controller->middleware()
+            : [];
 
-        if (method_exists(self::$controller, self::$method)) {
-            Debug::timer('Controller logic');
-            self::$controller->{self::$method}(...self::$vars);
-            Debug::timer('Controller logic');
-        }
+        $action = function () {
+            if (method_exists(self::$controller, self::$method)) {
+                Debug::timer('Controller logic');
+                self::$controller->{self::$method}(...self::$vars);
+                Debug::timer('Controller logic');
+            }
+        };
 
-        if (method_exists(self::$controller, 'afterMethod')) {
-            Debug::timer('afterMethod');
-            self::$controller->afterMethod();
-            Debug::timer('afterMethod');
-        }
+        $pipeline = array_reduce(
+            array_reverse($middlewares),
+            function (callable $carry, IMiddleware $middleware) {
+                return function () use ($middleware, $carry) {
+                    $middleware->handle($carry);
+                };
+            },
+            $action
+        );
+
+        $pipeline();
     }
 
     /**
