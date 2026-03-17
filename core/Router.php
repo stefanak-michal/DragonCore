@@ -78,13 +78,19 @@ final class Router
     {
         foreach (Config::gi()->get('routes', []) as $key => $value) {
             if (is_array($value)) {
-                $key = str_replace('\\', '/', $key);
-                if (strpos($key, 'controllers') !== 0)
-                    $key = 'controllers/' . $key;
+                $controller = str_replace('\\', '/', $key);
+                if (strpos($controller, 'controllers') !== 0)
+                    $controller = 'controllers/' . $controller;
 
-                foreach ($value as $mask => $route)
-                    $this->routes[$mask] = $key . '/' . $route;
+                foreach ($value as $mask => $route) {
+                    if (!is_string($mask))
+                        $mask = $key . '/' . $route;
+                    $this->routes[$mask] = $controller . '/' . $route;
+                }
             } else {
+                if (!is_string($key))
+                    $key = $value;
+
                 $value = str_replace('\\', '/', $value);
                 if (strpos($value, 'controllers') !== 0)
                     $value = 'controllers/' . $value;
@@ -92,6 +98,53 @@ final class Router
                 $this->routes[$key] = $value;
             }
         }
+    }
+
+    /**
+     * Extract the routable path from the current HTTP request.
+     * Strips the query string and normalises the result.
+     *
+     * @return string
+     */
+    private function extractPath(): string
+    {
+        $path = explode('?', $_SERVER['REQUEST_URI'] ?? '')[0];
+        return str_replace(['//', '../'], '/', trim(parse_url($path, PHP_URL_PATH) ?? '', '/'));
+    }
+
+    /**
+     * Resolve the current request to a controller/method/vars array.
+     * Reads default controller and method from Config.
+     * Falls back to defaults when no route matches.
+     *
+     * @return array{controller: array, method: string, vars: array}
+     */
+    public function resolve(): array
+    {
+        $cmv = [
+            'controller' => Config::gi()->get('defaultController'),
+            'method'     => Config::gi()->get('defaultMethod'),
+            'vars'       => [],
+        ];
+
+        if (is_string($cmv['controller'])) {
+            $cmv['controller'] = array_filter(explode('/', str_replace('\\', '/', $cmv['controller'])));
+            if (reset($cmv['controller']) !== 'controllers')
+                array_unshift($cmv['controller'], 'controllers');
+        }
+
+        $path = $this->extractPath();
+
+        if (!empty($path)) {
+            $found = $this->findRoute($path);
+            if (!empty($found)) {
+                $cmv = $found;
+            } else {
+                $cmv['vars'] = explode('/', $path);
+            }
+        }
+
+        return $cmv;
     }
 
     /**
@@ -317,6 +370,10 @@ final class Router
     {
         $output = [];
 
+        // Capture token types in declaration order before replacing with regex patterns
+        preg_match_all('/%[isd]/', $mask, $tokenMatches);
+        $tokenTypes = $tokenMatches[0];
+
         $mask = str_replace(['%i', '%s', '%d'], ['(-?\d+)', '(' . \core\Config::gi()->get('routeStringRegex', '[\w\-]+') . ')', '(-?[\d\.]+)'], $mask);
 
         $pattern = "/^";
@@ -326,10 +383,20 @@ final class Router
         if (preg_match($pattern, $path, $vars)) {
             $uri = array_filter(explode('/', $route));
             array_shift($vars);
+            $vars = array_values($vars);
+
+            foreach ($vars as $i => $var) {
+                $vars[$i] = match($tokenTypes[$i] ?? '%s') {
+                    '%i' => (int) $var,
+                    '%d' => (float) $var,
+                    default => $var,
+                };
+            }
+
             $output = [
                 'method' => array_pop($uri),
                 'controller' => $uri,
-                'vars' => array_values($vars)
+                'vars' => $vars
             ];
         }
 

@@ -30,32 +30,11 @@ final class Dragon
     public static $method;
 
     /**
-     * @static
-     * @var array
-     */
-    public static $vars;
-
-    /**
      * Run a project
      */
     public function run()
     {
-        $cmv = [
-            'controller' => Config::gi()->get('defaultController'),
-            'method' => Config::gi()->get('defaultMethod'),
-            'vars' => []
-        ];
-
-        if (is_string($cmv['controller'])) {
-            $cmv['controller'] = str_replace('\\', '/', $cmv['controller']);
-            $cmv['controller'] = array_filter(explode('/', $cmv['controller']));
-            if (reset($cmv['controller']) != 'controllers')
-                array_unshift($cmv['controller'], 'controllers');
-        }
-
-        $uri = new URI();
-        $uri->fetchUriString();
-        $this->resolveRoute($cmv, (string)$uri);
+        $cmv = Router::gi()->resolve();
 
         //must be defined before view->render, sorry for hardcode
         if (DRAGON_DEBUG) {
@@ -65,48 +44,31 @@ final class Dragon
         //finally we have something to show
         $this->loadController($cmv);
 
+        $request = new \http\Request($cmv['vars']);
+
         $middlewares = method_exists(self::$controller, 'middleware')
             ? self::$controller->middleware()
             : [];
 
-        $action = function () {
+        $action = function () use ($request) {
             if (method_exists(self::$controller, self::$method)) {
                 Debug::timer('Controller logic');
-                self::$controller->{self::$method}(...self::$vars);
+                self::$controller->{self::$method}($request);
                 Debug::timer('Controller logic');
             }
         };
 
         $pipeline = array_reduce(
             array_reverse($middlewares),
-            function (callable $carry, \middleware\IMiddleware $middleware) {
-                return function () use ($middleware, $carry) {
-                    $middleware->handle($carry);
+            function (callable $carry, \middleware\IMiddleware $middleware) use ($request) {
+                return function () use ($middleware, $carry, $request) {
+                    $middleware->handle($request, $carry);
                 };
             },
             $action
         );
 
         $pipeline();
-    }
-
-    /**
-     * @param array $cmv
-     * @param string $path
-     * @return void
-     */
-    private function resolveRoute(array &$cmv, string $path)
-    {
-        if (empty($path))
-            return;
-
-        $founded = Router::gi()->findRoute($path);
-        if (!empty($founded)) {
-            $cmv = $founded;
-        } else {
-            //append uri parts as variables for method invocation
-            $cmv['vars'] = explode('/', $path);
-        }
     }
 
     /**
@@ -121,7 +83,6 @@ final class Dragon
         $this->trySetView($cmv);
 
         self::$method = $cmv['method'];
-        self::$vars = $cmv['vars'];
 
         $last = ucfirst(array_pop($cmv['controller']));
         $className = "\\" . implode("\\", $cmv['controller']) . "\\" . $last;
