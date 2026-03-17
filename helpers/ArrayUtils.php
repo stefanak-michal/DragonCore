@@ -11,7 +11,6 @@ namespace helpers;
  */
 class ArrayUtils
 {
-
     /**
      * reIndex
      * For an array of assoc rays, return a new array of assoc rays using a certain field for keys
@@ -26,7 +25,7 @@ class ArrayUtils
 
     /**
      * Shuffle array with keeping keys
-     * 
+     *
      * @param array $array
      */
     public static function shuffleAssoc(array &$array)
@@ -129,7 +128,7 @@ class ArrayUtils
                 $out[] = $data[$key];
             }
 
-            foreach ($data AS $value) {
+            foreach ($data as $value) {
                 $out = array_merge($out, self::getAllValuesByKey($value, $key));
             }
         }
@@ -139,14 +138,14 @@ class ArrayUtils
 
     /**
      * Recursive array_map
-     * 
+     *
      * @param callable $func
      * @param array $arr
      * @return array
      */
     public static function arrayMapRecursive(callable $func, array $arr): array
     {
-        array_walk_recursive($arr, function(&$v) use ($func) {
+        array_walk_recursive($arr, function (&$v) use ($func) {
             $v = $func($v);
         });
 
@@ -155,7 +154,7 @@ class ArrayUtils
 
     /**
      * Find nearest number in array of numbers
-     * 
+     *
      * @param int $search
      * @param array $arr
      * @return int
@@ -171,5 +170,4 @@ class ArrayUtils
 
         return $closest;
     }
-
 }

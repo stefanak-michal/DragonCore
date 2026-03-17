@@ -89,7 +89,7 @@ abstract class SQLTable
                             'params' => null,
                             'stats' => '<pre><b>rows:</b> ' . ($params['rows'] ?? $params['affected'] ?? 0) . '</pre>',
                             'time (ms)' => $params['runtime'],
-                            'database' => $this->db()->getCurrentDB()
+                            'database' => $this->db()->getCurrentDB(),
                         ]);
                     });
                 } catch (MeekroDBException $e) {
@@ -131,10 +131,14 @@ abstract class SQLTable
         if (IS_WORKSPACE) {
             \core\Debug::var_dump($e->getMessage());
         } else {
-            file_put_contents(BASE_PATH . DS . 'tmp' . DS . 'error.log', '[' . date('Y-m-d H:i:s') . '] ' . $e->getMessage() . PHP_EOL . $e->getTraceAsString() . PHP_EOL, FILE_APPEND);
+            file_put_contents(
+                BASE_PATH . DS . 'tmp' . DS . 'error.log',
+                '[' . date('Y-m-d H:i:s') . '] ' . $e->getMessage() . PHP_EOL . $e->getTraceAsString() . PHP_EOL,
+                FILE_APPEND,
+            );
             http_response_code(500);
             echo 'We are sorry. Database error occured.';
-            exit;
+            exit();
         }
     }
 
@@ -362,5 +366,4 @@ abstract class SQLTable
             return false;
         }
     }
-
 }

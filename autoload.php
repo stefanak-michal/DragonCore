@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Autoload function
  *
@@ -7,7 +8,6 @@
  */
 
 spl_autoload_register(function ($name) {
-
     $parts = explode("\\", $name);
     $parts = array_filter($parts);
 
@@ -36,5 +36,4 @@ spl_autoload_register(function ($name) {
             return;
         }
     }
-
 });

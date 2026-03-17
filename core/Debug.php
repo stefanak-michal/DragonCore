@@ -64,7 +64,9 @@ final class Debug
                 var_dump($one);
                 $content = ob_get_clean();
 
-                self::$tables[__FUNCTION__][] = ['dump' => '<details><summary>' . $content . '</summary>' . self::backtrace() . '</details>'];
+                self::$tables[__FUNCTION__][] = [
+                    'dump' => '<details><summary>' . $content . '</summary>' . self::backtrace() . '</details>',
+                ];
             }
         }
     }
@@ -79,9 +81,16 @@ final class Debug
             return;
 
         $exists = file_exists($file);
-        $str = '<details><summary' . ($exists ? '' : ' class="red"') . '>' . $file . '</summary>' . self::backtrace() . '</details>';
+        $str =
+            '<details><summary'
+            . ($exists ? '' : ' class="red"')
+            . '>'
+            . $file
+            . '</summary>'
+            . self::backtrace()
+            . '</details>';
 
-        foreach ((self::$tables[__FUNCTION__] ?? []) as $i => $row) {
+        foreach (self::$tables[__FUNCTION__] ?? [] as $i => $row) {
             if ($row['file'] == $str) {
                 self::$tables[__FUNCTION__][$i]['hits'] += 1;
                 return;
@@ -91,7 +100,7 @@ final class Debug
         self::$tables[__FUNCTION__][] = [
             'file' => $str,
             'size (bytes)' => $exists ? filesize($file) : 0,
-            'hits' => 1
+            'hits' => 1,
         ];
     }
 
@@ -109,7 +118,7 @@ final class Debug
         } else {
             self::$tables[__FUNCTION__][] = [
                 'key' => '<details><summary>' . $key . '</summary>' . self::backtrace() . '</details>',
-                'time (msec)' => sprintf('%f', (microtime(true) - self::$timers[$key]) * 1000)
+                'time (msec)' => sprintf('%f', (microtime(true) - self::$timers[$key]) * 1000),
             ];
             unset(self::$timers[$key]);
         }
@@ -180,7 +189,6 @@ final class Debug
         return '<pre>' . implode('<br>', $values) . '</pre>';
     }
 
-
     /**
      * Generate debug html file from collected data
      */
@@ -196,15 +204,17 @@ final class Debug
         foreach (self::$tables as $key => $table)
             $counts[$key] = count($table);
 
-        $html = (new View('/views/elements/debug/report', [
-            'uri' => IS_CLI ? $GLOBALS['_SERVER']['SCRIPT_NAME'] : ($_SERVER['REQUEST_URI'] ?? ''),
-            'cm' => Dragon::$controller instanceof \controllers\IController ? get_class(Dragon::$controller) . '->' . Dragon::$method : '',
+        $html = new View('/views/elements/debug/report', [
+            'uri' => IS_CLI ? $GLOBALS['_SERVER']['SCRIPT_NAME'] : $_SERVER['REQUEST_URI'] ?? '',
+            'cm' => Dragon::$controller instanceof \controllers\IController
+                ? get_class(Dragon::$controller) . '->' . Dragon::$method
+                : '',
             'time' => \DateTime::createFromFormat('U.u', sprintf('%.4f', $time))->format('Y-m-d H:i:s.u'),
             'last' => Router::gi()->getHost() . 'tmp/debug/last.html',
             'tabs' => array_keys(self::$tables),
             'counts' => $counts,
-            'tables' => self::htmlTables()
-        ]))->render();
+            'tables' => self::htmlTables(),
+        ])->render();
 
         $filename = sprintf('%.4f', $time) . '.html';
         file_put_contents(BASE_PATH . DS . 'tmp' . DS . 'debug' . DS . $filename, $html);
@@ -252,13 +262,14 @@ final class Debug
                 continue;
 
             $data = file_get_contents($file);
-            preg_match("/URI: <b>([^<]*)/", $data, $match);
+            preg_match('/URI: <b>([^<]*)/', $data, $match);
             preg_match("/(\d+(\.\d+)?)\.html/", $file, $time);
 
             self::$tables[__FUNCTION__][] = [
                 'URI' => $match[1],
                 'date' => \DateTime::createFromFormat('U.u', $time[1])->format('Y-m-d H:i:s.u'),
-                '' => '<a href="' . Router::gi()->getHost() . 'tmp/debug/' . $time[1] . '.html" target="_blank">view</a>'
+                '' =>
+                    '<a href="' . Router::gi()->getHost() . 'tmp/debug/' . $time[1] . '.html" target="_blank">view</a>',
             ];
         }
     }
@@ -348,12 +359,11 @@ final class Debug
         foreach (self::$tables as $key => $table)
             $counts[$key] = count($table);
 
-        return (new View('/views/elements/debug/onsite', [
+        return new View('/views/elements/debug/onsite', [
             'cm' => str_replace("controllers\\", '', get_class(Dragon::$controller)) . '->' . Dragon::$method,
             'tabs' => array_keys(self::$tables),
             'counts' => $counts,
-            'tables' => self::htmlTables('')
-        ]))->render();
+            'tables' => self::htmlTables(''),
+        ])->render();
     }
-
 }

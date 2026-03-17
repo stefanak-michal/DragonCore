@@ -12,7 +12,6 @@ namespace core;
  */
 final class Router
 {
-
     /**
      * Base for all URI
      *
@@ -123,8 +122,8 @@ final class Router
     {
         $cmv = [
             'controller' => Config::gi()->get('defaultController'),
-            'method'     => Config::gi()->get('defaultMethod'),
-            'vars'       => [],
+            'method' => Config::gi()->get('defaultMethod'),
+            'vars' => [],
         ];
 
         if (is_string($cmv['controller'])) {
@@ -200,17 +199,19 @@ final class Router
      * @param array $vars
      * @param array $query
      * @return string
+     * @throws \InvalidArgumentException
      */
     public function url(string $controller, string $method = 'index', array $vars = [], array $query = []): string
     {
-        if (empty($controller) || empty($method) || !class_exists($controller))
-            exit;
+        if (empty($controller) || empty($method) || !class_exists($controller)) {
+            throw new \InvalidArgumentException('Missing required parameters.');
+        }
 
         $uri = '';
         $controller = str_replace('\\', '/', $controller);
         foreach ($this->getMasks($controller, $method) as $mask) {
             //check number of defined variables against mask
-            if (count($vars) != preg_match_all("/%[dis]/", $mask))
+            if (count($vars) != preg_match_all('/%[dis]/', $mask))
                 continue;
 
             $this->replaceMaskVariables($mask, $vars);
@@ -222,8 +223,8 @@ final class Router
             $uri = $this->project_host . $controller . '/' . $method;
             if (!empty($vars)) {
                 $uri .= '/' . implode('/', array_map(function ($value) {
-                        return filter_var($value, FILTER_SANITIZE_ENCODED);
-                    }, $vars));
+                    return filter_var($value, FILTER_SANITIZE_ENCODED);
+                }, $vars));
             }
         }
 
@@ -243,18 +244,18 @@ final class Router
             return;
 
         $i = 0;
-        while (preg_match("/%[dis]/", $mask, $match)) {
+        while (preg_match('/%[dis]/', $mask, $match)) {
             switch ($match[0]) {
                 case '%d':
-                    $mask = preg_replace("/%d/", (string)floatval($vars[$i]), $mask, 1);
+                    $mask = preg_replace('/%d/', (string) floatval($vars[$i]), $mask, 1);
                     break;
 
                 case '%i':
-                    $mask = preg_replace("/%i/", (string)intval($vars[$i]), $mask, 1);
+                    $mask = preg_replace('/%i/', (string) intval($vars[$i]), $mask, 1);
                     break;
 
                 case '%s':
-                    $mask = preg_replace("/%s/", filter_var($vars[$i], FILTER_SANITIZE_ENCODED), $mask, 1);
+                    $mask = preg_replace('/%s/', filter_var($vars[$i], FILTER_SANITIZE_ENCODED), $mask, 1);
                     break;
             }
 
@@ -344,11 +345,15 @@ final class Router
         preg_match_all('/%[isd]/', $mask, $tokenMatches);
         $tokenTypes = $tokenMatches[0];
 
-        $mask = str_replace(['%i', '%s', '%d'], ['(-?\d+)', '(' . \core\Config::gi()->get('routeStringRegex', '[\w\-]+') . ')', '(-?[\d\.]+)'], $mask);
+        $mask = str_replace(
+            ['%i', '%s', '%d'],
+            ['(-?\d+)', '(' . \core\Config::gi()->get('routeStringRegex', '[\w\-]+') . ')', '(-?[\d\.]+)'],
+            $mask,
+        );
 
-        $pattern = "/^";
+        $pattern = '/^';
         $pattern .= str_replace('/', '\/', $mask);
-        $pattern .= "$/i";
+        $pattern .= '$/i';
 
         if (preg_match($pattern, $path, $vars)) {
             $uri = array_filter(explode('/', $route));
@@ -356,7 +361,7 @@ final class Router
             $vars = array_values($vars);
 
             foreach ($vars as $i => $var) {
-                $vars[$i] = match($tokenTypes[$i] ?? '%s') {
+                $vars[$i] = match ($tokenTypes[$i] ?? '%s') {
                     '%i' => (int) $var,
                     '%d' => (float) $var,
                     default => $var,
@@ -366,11 +371,10 @@ final class Router
             $output = [
                 'method' => array_pop($uri),
                 'controller' => $uri,
-                'vars' => $vars
+                'vars' => $vars,
             ];
         }
 
         return $output;
     }
-
 }

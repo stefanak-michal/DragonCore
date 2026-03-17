@@ -64,7 +64,7 @@ class Assets
             }
         }
     }
-    
+
     /**
      * Remove assets from load
      * @param string ...$names relative path to css/js asset file in assets directory
@@ -126,5 +126,4 @@ class Assets
 
         return implode(PHP_EOL, $output);
     }
-
 }

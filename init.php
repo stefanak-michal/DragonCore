@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Project initialization script
  *
@@ -29,7 +30,10 @@ if (file_exists(DRAGON_PATH . DS . 'vendor' . DS . 'autoload.php'))
 
 if (!defined('IS_WORKSPACE')) {
     $workspace = false;
-    if (file_exists(BASE_PATH . DS . 'config' . DS . 'development' . DS) || in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1']))
+    if (
+        file_exists(BASE_PATH . DS . 'config' . DS . 'development' . DS)
+        || in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'])
+    )
         $workspace = true;
     define('IS_WORKSPACE', $workspace);
 }
@@ -63,6 +67,6 @@ $autorun = $autorun ?? true;
 
 //Execute project
 $app = new \core\Dragon();
-if ( !IS_CLI && $autorun ) {
+if (!IS_CLI && $autorun) {
     $app->run();
 }

@@ -13,7 +13,6 @@ namespace middleware;
  */
 readonly class Cors implements IMiddleware
 {
-
     /**
      * @param string $allowedOrigin
      * @param array $allowedMethods
@@ -24,7 +23,7 @@ readonly class Cors implements IMiddleware
         private string $allowedOrigin = '*',
         private array $allowedMethods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
         private array $allowedHeaders = ['Content-Type', 'Authorization'],
-        private int $maxAge = 86400
+        private int $maxAge = 86400,
     ) {}
 
     public function handle(\http\Request $request, \http\Response $response, callable $next): \http\Response
@@ -41,5 +40,4 @@ readonly class Cors implements IMiddleware
 
         return $next();
     }
-
 }

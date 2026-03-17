@@ -15,7 +15,6 @@ namespace middleware;
 #[RequiresMiddleware(Session::class)]
 class Csrf implements IMiddleware
 {
-
     /**
      * Session key for the CSRF token
      *
@@ -59,11 +58,10 @@ class Csrf implements IMiddleware
      * Generate an HTML hidden input field with the CSRF token
      *
      * @return string
-     */    
+     */
     public static function field(): string
     {
         $token = self::token();
         return '<input type="hidden" name="' . self::TOKEN_KEY . '" value="' . $token . '">';
     }
-
 }

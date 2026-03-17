@@ -14,7 +14,6 @@ namespace http;
  */
 class Response
 {
-
     /**
      * HTTP status code
      *
@@ -114,17 +113,19 @@ class Response
     {
         if (DRAGON_DEBUG) {
             header('Content-Type: text/html');
-            echo (new \core\View('/views/elements/debug/backtrace', [
-                'bt' => debug_backtrace(),
-                'url' => $uri,
-                'code' => $code,
-            ]))->render();
-            exit;
+            echo
+                new \core\View('/views/elements/debug/backtrace', [
+                    'bt' => debug_backtrace(),
+                    'url' => $uri,
+                    'code' => $code,
+                ])->render()
+            ;
+            exit();
         }
 
         http_response_code($code);
         header('Location: ' . $uri);
-        exit;
+        exit();
     }
 
     /**
@@ -173,5 +174,4 @@ class Response
 
         echo $this->body;
     }
-
 }

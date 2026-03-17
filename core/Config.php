@@ -12,7 +12,6 @@ namespace core;
  */
 final class Config
 {
-
     /**
      * Array of all config variables
      *
@@ -53,7 +52,7 @@ final class Config
      */
     public static function gi(): Config
     {
-        if (!(self::$instance instanceof self)) {
+        if (!self::$instance instanceof self) {
             self::$instance = new Config();
 
             $names = [];
@@ -93,7 +92,7 @@ final class Config
             DRAGON_PATH . DS . 'config' . DS . $filename,
             DRAGON_PATH . DS . 'config' . DS . (IS_WORKSPACE ? 'development' : 'production') . DS . $filename,
             BASE_PATH . DS . 'config' . DS . $filename,
-            BASE_PATH . DS . 'config' . DS . (IS_WORKSPACE ? 'development' : 'production') . DS . $filename
+            BASE_PATH . DS . 'config' . DS . (IS_WORKSPACE ? 'development' : 'production') . DS . $filename,
         ];
 
         foreach ($files as $file) {
@@ -193,5 +192,4 @@ final class Config
             }
         }
     }
-
 }

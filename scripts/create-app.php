@@ -11,13 +11,13 @@
 
 if ($argc != 2) {
     echo 'You have to enter target path for your app as argument';
-    exit;
+    exit();
 }
 
 if (file_exists($argv[1])) {
     if (!is_dir($argv[1]) || count(scandir($argv[1])) > 2) {
         echo 'Target path has to be empty directory';
-        exit;
+        exit();
     }
 }
 
@@ -50,7 +50,7 @@ $dirs = [
 foreach ($dirs as $dir) {
     if (!mkdir(BASE_PATH . DS . $dir)) {
         echo 'Cannot create directory at ' . BASE_PATH . DS . $dir;
-        exit;
+        exit();
     }
 }
 
@@ -120,7 +120,6 @@ $aConfig = [
 
 EOD;
 file_put_contents(BASE_PATH . DS . 'config' . DS . 'routes.cfg.php', $config);
-
 
 //controller
 file_put_contents(BASE_PATH . DS . 'controllers' . DS . 'Homepage.php', '<?php

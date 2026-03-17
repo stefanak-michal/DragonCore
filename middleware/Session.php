@@ -11,11 +11,9 @@ namespace middleware;
  */
 class Session implements IMiddleware
 {
-
     public function handle(\http\Request $request, \http\Response $response, callable $next): \http\Response
     {
         \helpers\Session::start();
         return $next();
     }
-    
 }

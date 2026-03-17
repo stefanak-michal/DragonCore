@@ -8,7 +8,7 @@ use PHPMailer\PHPMailer\PHPMailer;
 /**
  * PHPMailer facade
  * Sending different service/notification emails
- * 
+ *
  * <pre>
  * $email = new Email();
  * $email->setTo('john.doe@email.com', 'John Doe')->setTitle('Do not read this')->send(new \core\View('/templates/email/sample', []));
@@ -47,7 +47,7 @@ class Email
 
     /**
      * Set to
-     * 
+     *
      * @param string $email
      * @param string $name
      * @return Email
@@ -95,7 +95,7 @@ class Email
 
     /**
      * Set reply address
-     * 
+     *
      * @param string $email
      * @param string $name
      * @return Email
@@ -111,7 +111,7 @@ class Email
 
     /**
      * Set title
-     * 
+     *
      * @uses ..\config\main.lt.php
      * @param string $title
      * @return Email
@@ -147,7 +147,7 @@ class Email
 
     /**
      * Set to call reset after send
-     * 
+     *
      * @param bool $reset
      * @return Email
      */
@@ -170,8 +170,12 @@ class Email
         $this->content = $view->render();
         if (!empty($this->content)) {
             //auto add pictures
-            if (preg_match_all(@"/\"cid:([^\"]+)\"/", $this->content, $matches) > 0) {
-                $path = pathinfo($view->getView(), PATHINFO_DIRNAME) . DS . pathinfo($view->getView(), PATHINFO_FILENAME) . DS;
+            if (preg_match_all("/\"cid:([^\"]+)\"/", $this->content, $matches) > 0) {
+                $path =
+                    pathinfo($view->getView(), PATHINFO_DIRNAME)
+                    . DS
+                    . pathinfo($view->getView(), PATHINFO_FILENAME)
+                    . DS;
                 foreach ($matches[1] as $match) {
                     if (file_exists($path . $match))
                         $this->addPicture($path . $match, $match);
@@ -184,7 +188,7 @@ class Email
                 \core\Debug::var_dump($e->getMessage());
             }
         }
-        
+
         return $output;
     }
 
@@ -237,7 +241,12 @@ class Email
 
             foreach ($this->attachments as $filename => $path) {
                 $dot = strrpos($filename, '.');
-                $mailer->addAttachment($path, $filename, PHPMailer::ENCODING_BASE64, PHPMailer::_mime_types(substr($filename, $dot + 1)));
+                $mailer->addAttachment(
+                    $path,
+                    $filename,
+                    PHPMailer::ENCODING_BASE64,
+                    PHPMailer::_mime_types(substr($filename, $dot + 1)),
+                );
             }
 
             foreach ($this->pictures as $cid => $file) {

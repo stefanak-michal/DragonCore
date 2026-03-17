@@ -14,7 +14,6 @@ namespace http;
  */
 class Request
 {
-
     /**
      * Query string parameters ($_GET)
      *
@@ -89,16 +88,17 @@ class Request
 
     public function __construct(array $params = [])
     {
-        $this->get     = $_GET     ?? [];
-        $this->post    = $_POST    ?? [];
-        $this->files   = $_FILES   ?? [];
-        $this->cookies = $_COOKIE  ?? [];
-        $this->server  = $_SERVER  ?? [];
+        $this->get = $_GET ?? [];
+        $this->post = $_POST ?? [];
+        $this->files = $_FILES ?? [];
+        $this->cookies = $_COOKIE ?? [];
+        $this->server = $_SERVER ?? [];
         $this->headers = $this->parseHeaders();
-        $this->method  = RequestMethod::tryFrom(strtoupper($this->server['REQUEST_METHOD'] ?? 'GET')) ?? RequestMethod::GET;
-        $this->uri     = $this->server['REQUEST_URI'] ?? '/';
-        $this->body    = file_get_contents('php://input') ?: '';
-        $this->params  = $params;
+        $this->method =
+            RequestMethod::tryFrom(strtoupper($this->server['REQUEST_METHOD'] ?? 'GET')) ?? RequestMethod::GET;
+        $this->uri = $this->server['REQUEST_URI'] ?? '/';
+        $this->body = file_get_contents('php://input') ?: '';
+        $this->params = $params;
     }
 
     /**
@@ -218,5 +218,4 @@ class Request
     {
         return \helpers\Utils::realIp();
     }
-
 }

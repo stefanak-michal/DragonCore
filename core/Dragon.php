@@ -12,7 +12,6 @@ namespace core;
  */
 final class Dragon
 {
-
     /**
      * Called controller
      *
@@ -47,9 +46,7 @@ final class Dragon
         $request = new \http\Request($cmv['vars']);
         $response = new \http\Response();
 
-        $middlewares = method_exists(self::$controller, 'middleware')
-            ? self::$controller->middleware()
-            : [];
+        $middlewares = method_exists(self::$controller, 'middleware') ? self::$controller->middleware() : [];
 
         $this->validateMiddlewareDependencies($middlewares);
 
@@ -69,7 +66,7 @@ final class Dragon
                     return $middleware->handle($request, $response, $carry);
                 };
             },
-            $action
+            $action,
         );
 
         $response = $pipeline();
@@ -104,7 +101,7 @@ final class Dragon
     private function trySetView(array $cmv)
     {
         array_shift($cmv['controller']);
-        
+
         $possibleViewFile = [
             implode('/', $cmv['controller']) . '/' . $cmv['method'],
             strtolower(implode('/', $cmv['controller'])) . '/' . $cmv['method'],
@@ -150,7 +147,7 @@ final class Dragon
 
                 if (!$found) {
                     throw new \RuntimeException(
-                        get_class($middleware) . ' requires ' . $required . ' to be registered before it'
+                        get_class($middleware) . ' requires ' . $required . ' to be registered before it',
                     );
                 }
             }
@@ -163,5 +160,4 @@ final class Dragon
             Debug::generate();
         }
     }
-
 }

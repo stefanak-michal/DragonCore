@@ -11,36 +11,35 @@ namespace helpers;
  */
 class Utils
 {
-
     /**
      * Closing tags in html
-     * 
+     *
      * @param string $text
      * @return string
      */
     public static function closeTags(string $text): string
     {
         $patt_open = "%((?<!</)(?<=<)[\s]*[^/!>\s]+(?=>|[\s]+[^>]*[^/]>)(?!/>))%";
-        $patt_close = "%((?<=</)([^>]+)(?=>))%";
-        if ( preg_match_all($patt_open, $text, $matches) ) {
+        $patt_close = '%((?<=</)([^>]+)(?=>))%';
+        if (preg_match_all($patt_open, $text, $matches)) {
             $m_open = $matches[1];
-            if ( !empty($m_open) ) {
+            if (!empty($m_open)) {
                 preg_match_all($patt_close, $text, $matches2);
                 $m_close = $matches2[1];
-                if ( count($m_open) > count($m_close) ) {
+                if (count($m_open) > count($m_close)) {
                     $c_tags = array();
                     $m_open = array_reverse($m_open);
-                    foreach ( $m_close as $tag ) {
-                        if ( !empty($tag) ) {
-                            if ( !isset($c_tags[$tag]) ) {
+                    foreach ($m_close as $tag) {
+                        if (!empty($tag)) {
+                            if (!isset($c_tags[$tag])) {
                                 $c_tags[$tag] = 0;
                             }
 
-                            $c_tags[$tag] ++;
+                            $c_tags[$tag]++;
                         }
                     }
-                    foreach ( $m_open as $k => $tag ) {
-                        if ( isset($c_tags[$tag]) AND $c_tags[$tag] -- <= 0 ) {
+                    foreach ($m_open as $k => $tag) {
+                        if (isset($c_tags[$tag]) AND $c_tags[$tag]-- <= 0) {
                             $text .= '</' . $tag . '>';
                         }
                     }
@@ -52,7 +51,7 @@ class Utils
 
     /**
      * Return size in bytes
-     * 
+     *
      * @param string $val
      * @return int
      */
@@ -60,7 +59,7 @@ class Utils
     {
         $val = trim($val);
         $last = strtolower($val[strlen($val) - 1]);
-        switch ( $last ) {
+        switch ($last) {
             case 'g':
                 $val *= 1024;
             case 'm':
@@ -71,10 +70,10 @@ class Utils
 
         return $val;
     }
-    
+
     /**
      * Return size in human readable version
-     * 
+     *
      * @param int $size
      * @return string
      */
@@ -82,35 +81,37 @@ class Utils
     {
         $size = (int) $size;
         $units = ['kB', 'MB', 'GB'];
-        
+
         $outputUnit = 'b';
         $output = $size;
-        
-        while ( $output > 1024 ) {
-            if ( empty($units) ) {
+
+        while ($output > 1024) {
+            if (empty($units)) {
                 break;
             }
-            
+
             $output = $output / 1024;
             $outputUnit = array_shift($units);
         }
-        
+
         return round($output, 2) . $outputUnit;
     }
 
     /**
      * Return client IP
-     * 
+     *
      * @return string
      */
     public static function realIp(): string
     {
-        return Utils::param('HTTP_CLIENT_IP', 'SERVER') ?? Utils::param('HTTP_X_FORWARDED_FOR', 'SERVER') ?? Utils::param('REMOTE_ADDR', 'SERVER');
+        return (
+            $_SERVER['HTTP_CLIENT_IP'] ?? $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0'
+        );
     }
 
     /**
      * Get request header by key
-     * 
+     *
      * @param string $key
      * @param boolean $lowercase
      * @return mixed
@@ -119,7 +120,7 @@ class Utils
     {
         $headers = apache_request_headers();
 
-        if ( $lowercase ) {
+        if ($lowercase) {
             $headers = array_flip($headers);
             $headers = array_map('strtolower', $headers);
             $headers = array_flip($headers);
@@ -127,19 +128,6 @@ class Utils
         }
 
         return $headers[$key] ?? false;
-    }
-    
-    /**
-     * Return global variable
-     * 
-     * @param string $name
-     * @param string $type
-     * @param mixed $default
-     * @return mixed
-     */
-    public static function param(string $name, string $type = 'GET', $default = null)
-    {
-        return $GLOBALS['_' . strtoupper($type)][$name] ?? $default;
     }
 
     /**
@@ -157,7 +145,7 @@ class Utils
             CURLOPT_URL => $url,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_SSL_VERIFYHOST => false,
-            CURLOPT_SSL_VERIFYPEER => false
+            CURLOPT_SSL_VERIFYPEER => false,
         ];
 
         if (!empty($data)) {
@@ -194,9 +182,13 @@ class Utils
      */
     public static function snake_case(string $str): string
     {
-        return trim(preg_replace_callback("/[A-Z]/", function ($item) {
-            return '_' . strtolower($item[0]);
-        }, $str), '_');
+        return trim(
+            preg_replace_callback(
+                '/[A-Z]/',
+                fn(array $item) => '_' . strtolower($item[0]),
+                $str,
+            ),
+            '_',
+        );
     }
-
 }

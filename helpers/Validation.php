@@ -78,5 +78,4 @@ class Validation
 
         return true;
     }
-    
 }

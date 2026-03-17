@@ -19,12 +19,10 @@ namespace middleware;
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 class RequiresMiddleware
 {
-
     /**
      * @param string $middleware Fully qualified class name of the required middleware
      */
     public function __construct(
-        public readonly string $middleware
+        public readonly string $middleware,
     ) {}
-
 }

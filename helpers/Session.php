@@ -14,7 +14,6 @@ namespace helpers;
  */
 class Session
 {
-
     /**
      * Key used to store flash messages in $_SESSION
      *
@@ -200,5 +199,4 @@ class Session
         unset($_SESSION[self::FLASH_KEY][$key]);
         return $value;
     }
-
 }

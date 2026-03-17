@@ -73,7 +73,7 @@ final class View
      */
     public function view(?string $view = null): bool
     {
-        $this->view = $this->path((string)$view);
+        $this->view = $this->path((string) $view);
         return !empty($this->view);
     }
 
@@ -83,7 +83,7 @@ final class View
      */
     public function getView(): string
     {
-        return (string)$this->view;
+        return (string) $this->view;
     }
 
     /**
@@ -93,7 +93,7 @@ final class View
      */
     public function layout(?string $layout = null): bool
     {
-        $this->layout = $this->path((string)$layout);
+        $this->layout = $this->path((string) $layout);
         return !empty($this->layout);
     }
 
@@ -103,7 +103,7 @@ final class View
      */
     public function getLayout(): string
     {
-        return (string)$this->layout;
+        return (string) $this->layout;
     }
 
     /**
@@ -112,7 +112,7 @@ final class View
      * @param mixed $value
      * @return View
      */
-    public function set(string $key, $value) : View
+    public function set(string $key, $value): View
     {
         $this->vars[$key] = $value;
         return $this;
@@ -123,7 +123,7 @@ final class View
      * @param array $vars
      * @return View
      */
-    public function vars(array $vars) : View
+    public function vars(array $vars): View
     {
         $this->vars = array_merge($this->vars, $vars);
         return $this;
@@ -150,7 +150,7 @@ final class View
         $content = ob_get_clean();
 
         //after render clean up memory
-        foreach ( $this->vars as $key => $variable )
+        foreach ($this->vars as $key => $variable)
             unset(${$key});
 
         if (is_callable(self::$afterRender))
@@ -180,7 +180,7 @@ final class View
         $html = ob_get_clean();
 
         //after render clean up memory
-        foreach ( $this->vars as $key => $variable )
+        foreach ($this->vars as $key => $variable)
             unset(${$key});
 
         if (is_callable(self::$afterRender))
