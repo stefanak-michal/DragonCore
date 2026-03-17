@@ -45,30 +45,33 @@ final class Dragon
         $this->loadController($cmv);
 
         $request = new \http\Request($cmv['vars']);
+        $response = new \http\Response();
 
         $middlewares = method_exists(self::$controller, 'middleware')
             ? self::$controller->middleware()
             : [];
 
-        $action = function () use ($request) {
+        $action = function () use ($request, $response) {
             if (method_exists(self::$controller, self::$method)) {
                 Debug::timer('Controller logic');
-                self::$controller->{self::$method}($request);
+                $response = self::$controller->{self::$method}($request, $response);
                 Debug::timer('Controller logic');
             }
+            return $response;
         };
 
         $pipeline = array_reduce(
             array_reverse($middlewares),
-            function (callable $carry, \middleware\IMiddleware $middleware) use ($request) {
-                return function () use ($middleware, $carry, $request) {
-                    $middleware->handle($request, $carry);
+            function (callable $carry, \middleware\IMiddleware $middleware) use ($request, $response) {
+                return function () use ($middleware, $carry, $request, $response) {
+                    return $middleware->handle($request, $response, $carry);
                 };
             },
             $action
         );
 
-        $pipeline();
+        $response = $pipeline();
+        $response->send();
     }
 
     /**

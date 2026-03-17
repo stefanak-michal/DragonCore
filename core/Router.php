@@ -310,36 +310,6 @@ final class Router
     }
 
     /**
-     * Redirect
-     *
-     * @param string $uri
-     * @param string $message
-     * @param int $code
-     */
-    public function redirect(string $uri, string $message = '', int $code = 302)
-    {
-        if (!empty($uri)) {
-            if (!empty($message)) {
-                setcookie('message', $message, time() + 60, '/');
-            }
-
-            if (DRAGON_DEBUG) {
-                header('Content-Type: text/html');
-                echo (new View('/views/elements/debug/backtrace', [
-                    'bt' => debug_backtrace(),
-                    'url' => $uri,
-                    'code' => $code,
-                    'message' => $message
-                ]))->render();
-            } else {
-                header('Location: ' . $uri, true, $code);
-            }
-
-            exit;
-        }
-    }
-
-    /**
      * Find route
      *
      * @param string $path

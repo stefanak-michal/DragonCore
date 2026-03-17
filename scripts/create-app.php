@@ -134,9 +134,10 @@ namespace controllers;
 class Homepage implements IController
 {
 
-    public function index()
+    public function index(\http\Request $request, \http\Response $response): \http\Response
     {
         \core\View::gi()->set("msg", "Hello ' . basename(BASE_PATH) . '!");
+        return $response;
     }
 
     public function middleware(): array
@@ -158,18 +159,18 @@ namespace middleware;
  * Renders the view after the controller action
  * @package middleware
  */
-class RenderMiddleware implements \middleware\IMiddleware
+class RenderMiddleware implements IMiddleware
 {
 
-    public function handle(callable $next): void
+    public function handle(\http\Request $request, \http\Response $response, callable $next): \http\Response
     {
-        $next();
+        $response = $next();
 
         $content = \core\View::gi()->render();
         $pos = strrpos($content, "</body>");
         if (IS_WORKSPACE && $pos !== false)
             $content = substr_replace($content, \core\Debug::onsite(), $pos, 0);
-        echo $content;
+        return $response->html($content);
     }
 }
 ');

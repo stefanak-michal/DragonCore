@@ -15,8 +15,9 @@ interface IMiddleware
      * Handle the request, optionally passing control to the next middleware or action
      *
      * @param \http\Request $request
+     * @param \http\Response $response
      * @param callable $next
-     * @return void
+     * @return \http\Response
      */
-    public function handle(\http\Request $request, callable $next): void;
+    public function handle(\http\Request $request, \http\Response $response, callable $next): \http\Response;
 }
