@@ -51,6 +51,8 @@ final class Dragon
             ? self::$controller->middleware()
             : [];
 
+        $this->validateMiddlewareDependencies($middlewares);
+
         $action = function () use ($request, $response) {
             if (method_exists(self::$controller, self::$method)) {
                 Debug::timer('Controller logic');
@@ -81,7 +83,7 @@ final class Dragon
     {
         //if we have nothing to do, then quit
         if (empty($cmv) or empty($cmv['controller']) or empty($cmv['method']))
-            trigger_error('Unresolved controller->method action', E_USER_ERROR);
+            throw new \RuntimeException('Route resolved to empty controller or method');
 
         $this->trySetView($cmv);
 
@@ -90,7 +92,7 @@ final class Dragon
         $last = ucfirst(array_pop($cmv['controller']));
         $className = "\\" . implode("\\", $cmv['controller']) . "\\" . $last;
         if (!class_exists($className))
-            trigger_error('Missing class ' . $className, E_USER_ERROR);
+            throw new \RuntimeException("Controller class $className not found");
 
         self::$controller = new $className();
     }
@@ -119,6 +121,39 @@ final class Dragon
         foreach ($possibleViewFile as $viewFile) {
             if (View::gi()->view($viewFile))
                 break;
+        }
+    }
+
+    /**
+     * Validate that middleware dependencies declared via #[RequiresMiddleware]
+     * are satisfied and ordered correctly in the stack.
+     *
+     * @param \middleware\IMiddleware[] $middlewares
+     * @throws \RuntimeException
+     */
+    private function validateMiddlewareDependencies(array $middlewares): void
+    {
+        foreach ($middlewares as $index => $middleware) {
+            $ref = new \ReflectionClass($middleware);
+            $attributes = $ref->getAttributes(\middleware\RequiresMiddleware::class);
+
+            foreach ($attributes as $attribute) {
+                $required = $attribute->newInstance()->middleware;
+
+                $found = false;
+                for ($i = 0; $i < $index; $i++) {
+                    if ($middlewares[$i] instanceof $required) {
+                        $found = true;
+                        break;
+                    }
+                }
+
+                if (!$found) {
+                    throw new \RuntimeException(
+                        get_class($middleware) . ' requires ' . $required . ' to be registered before it'
+                    );
+                }
+            }
         }
     }
 
