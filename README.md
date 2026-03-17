@@ -1,17 +1,15 @@
-![Dragon MVC](https://raw.githubusercontent.com/stefanak-michal/DragonMVC/master/assets/img/title.jpg "Dragon MVC")
+<img width="1348" height="633" alt="DragonCore" src="https://github.com/user-attachments/assets/d746aa0a-c8ee-48e8-9a92-0a5731070131" />
 
 # Dragon MVC PHP Framework
 
 * Easy deployment and setup
 * MVC structure
-* Config system with lookup tables
-* Namespaces
+* Config as php files with support of lookup tables
 * Simple file names conventions
+* One core for multiple projects
 * Autoloader with vendor support
 * CLI support
-* PHP >= 7.4
-
-_Logo designed by Freepik.com_
+* PHP >= 8.5
 
 ## How to start
 
