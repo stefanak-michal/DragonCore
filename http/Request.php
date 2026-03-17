@@ -166,14 +166,10 @@ class Request
      */
     public function json(bool $assoc = true): mixed
     {
-        if (empty($this->body)) {
+        if (empty($this->body) || !json_validate($this->body)) {
             return null;
         }
-        $decoded = json_decode($this->body, $assoc);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            return null;
-        }
-        return $decoded;
+        return json_decode($this->body, $assoc);
     }
 
     /**
