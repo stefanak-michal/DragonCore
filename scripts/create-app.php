@@ -143,34 +143,8 @@ class Homepage implements IController
     public function middleware(): array
     {
         return [
-            new \middleware\RenderMiddleware(),
+            new \middleware\Render(),
         ];
-    }
-}
-');
-
-//render middleware
-file_put_contents(BASE_PATH . DS . 'middleware' . DS . 'RenderMiddleware.php', '<?php
-
-namespace middleware;
-
-/**
- * Class RenderMiddleware
- * Renders the view after the controller action
- * @package middleware
- */
-class RenderMiddleware implements IMiddleware
-{
-
-    public function handle(\http\Request $request, \http\Response $response, callable $next): \http\Response
-    {
-        $response = $next();
-
-        $content = \core\View::gi()->render();
-        $pos = strrpos($content, "</body>");
-        if (IS_WORKSPACE && $pos !== false)
-            $content = substr_replace($content, \core\Debug::onsite(), $pos, 0);
-        return $response->html($content);
     }
 }
 ');
