@@ -6,14 +6,14 @@ use MeekroDB\MeekroDB;
 use MeekroDB\MeekroDBException;
 
 /**
- * AModel
- * Base database model with CRUD actions for extending
+ * SQLTable
+ * Base database table model with CRUD actions for extending
  *
  * @author Michal Stefanak
  * @link https://github.com/stefanak-michal/DragonMVC
  * @package models
  */
-abstract class MySQL
+abstract class SQLTable
 {
     /**
      * Table name
