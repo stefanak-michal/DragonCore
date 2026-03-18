@@ -35,7 +35,6 @@ final class Dragon
     {
         $cmv = Router::gi()->resolve();
 
-        //must be defined before view->render, sorry for hardcode
         if (DRAGON_DEBUG) {
             header('X-Dragon-Debug: ' . Router::gi()->getHost() . 'tmp/debug/last.html');
         }
@@ -82,8 +81,6 @@ final class Dragon
         if (empty($cmv) or empty($cmv['controller']) or empty($cmv['method']))
             throw new \RuntimeException('Route resolved to empty controller or method');
 
-        $this->trySetView($cmv);
-
         self::$method = $cmv['method'];
 
         $last = ucfirst(array_pop($cmv['controller']));
@@ -92,33 +89,6 @@ final class Dragon
             throw new \RuntimeException("Controller class $className not found");
 
         self::$controller = new $className();
-    }
-
-    /**
-     * Try to set view file by possible paths
-     * @param array $cmv
-     */
-    private function trySetView(array $cmv)
-    {
-        array_shift($cmv['controller']);
-
-        $possibleViewFile = [
-            implode('/', $cmv['controller']) . '/' . $cmv['method'],
-            strtolower(implode('/', $cmv['controller'])) . '/' . $cmv['method'],
-            strtolower(implode('/', $cmv['controller']) . '/' . $cmv['method']),
-        ];
-
-        $snake_case = [];
-        foreach ($cmv['controller'] as $part)
-            $snake_case[] = \helpers\Utils::snake_case($part);
-        $possibleViewFile[] = implode('/', $snake_case) . '/' . $cmv['method'];
-        $possibleViewFile[] = implode('/', $snake_case) . '/' . strtolower($cmv['method']);
-        $possibleViewFile[] = implode('/', $snake_case) . '/' . \helpers\Utils::snake_case($cmv['method']);
-
-        foreach ($possibleViewFile as $viewFile) {
-            if (View::gi()->view($viewFile))
-                break;
-        }
     }
 
     /**
