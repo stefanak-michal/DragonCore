@@ -19,14 +19,13 @@ if (!defined('BASE_PATH')) {
 }
 
 if (!defined('DRAGON_PATH')) {
-    define('DRAGON_PATH', __DIR__);
+    define('DRAGON_PATH', __DIR__ . DS . 'src');
 }
 
-require_once __DIR__ . DS . 'autoload.php';
 if (file_exists(BASE_PATH . DS . 'vendor' . DS . 'autoload.php'))
     require_once BASE_PATH . DS . 'vendor' . DS . 'autoload.php';
-if (file_exists(DRAGON_PATH . DS . 'vendor' . DS . 'autoload.php'))
-    require_once DRAGON_PATH . DS . 'vendor' . DS . 'autoload.php';
+if (file_exists(__DIR__ . DS . 'vendor' . DS . 'autoload.php'))
+    require_once __DIR__ . DS . 'vendor' . DS . 'autoload.php';
 
 if (!defined('IS_WORKSPACE')) {
     $workspace = false;
@@ -46,8 +45,8 @@ if (IS_CLI) {
 }
 
 if (!defined('DRAGON_DEBUG')) {
-    if (\core\Config::gi()->get('debug') !== null) {
-        $debug = \core\Config::gi()->get('debug') == 1;
+    if (\Dragon\Config::gi()->get('debug') !== null) {
+        $debug = \Dragon\Config::gi()->get('debug') == 1;
     } else {
         $debug = IS_WORKSPACE;
     }
@@ -55,18 +54,18 @@ if (!defined('DRAGON_DEBUG')) {
 }
 
 /**
- * Dragon debug - simple alias for \dragon\Debug::var_dump
+ * Dragon debug - simple alias for \Dragon\Debug::var_dump()
  * @param mixed ...$vars
  */
 function dump(...$vars)
 {
-    \core\Debug::var_dump(...$vars);
+    \Dragon\Debug::var_dump(...$vars);
 }
 
 $autorun = $autorun ?? true;
 
 //Execute project
-$app = new \core\Dragon();
+$app = new \Dragon\Application();
 if (!IS_CLI && $autorun) {
     $app->run();
 }

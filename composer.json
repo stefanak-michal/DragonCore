@@ -1,8 +1,8 @@
 {
-    "name": "stefanak-michal/dragonmvc",
-    "description": "PHP MVC framework. Simple, fast and lightweight.",
-    "keywords": ["php", "mvc", "framework"],
-    "homepage": "https://github.com/stefanak-michal/DragonMVC",
+    "name": "stefanak-michal/dragoncore",
+    "description": "PHP framework. Simple, fast and lightweight.",
+    "keywords": ["php", "mvc", "framework", "dragoncore"],
+    "homepage": "https://github.com/stefanak-michal/DragonCore",
     "type": "project",
     "readme": "README.md",
     "license": "MIT",
@@ -10,13 +10,11 @@
     "require": {
         "php": "^8.5",
         "ext-curl": "*",
-        "stefanak-michal/meekrodb": "*",
-        "stefanak-michal/bolt": "^7.4",
         "phpmailer/phpmailer": "^6"
     },
     "support": {
-        "issues": "https://github.com/stefanak-michal/DragonMVC/issues",
-        "source": "https://github.com/stefanak-michal/DragonMVC"
+        "issues": "https://github.com/stefanak-michal/DragonCore/issues",
+        "source": "https://github.com/stefanak-michal/DragonCore"
     },
     "funding": [
         {
@@ -30,5 +28,10 @@
             "role": "Developer",
             "homepage": "https://www.linkedin.com/in/michalstefanak/"
         }
-    ]
+    ],
+    "autoload": {
+        "psr-4": {
+            "Dragon\\": "src/"
+        }
+    }
 }

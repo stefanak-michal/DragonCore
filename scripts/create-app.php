@@ -6,7 +6,7 @@
  *
  * @author Michal Stefanak
  * @package scripts
- * @link https://github.com/stefanak-michal/DragonMVC
+ * @link https://github.com/stefanak-michal/DragonCore
  */
 
 if ($argc != 2) {
@@ -61,8 +61,8 @@ $index = <<<'EOD'
 $path = '';
 $paths = [
     getenv('DRAGON_PATH'),
-    __DIR__ . DIRECTORY_SEPARATOR . 'dragonmvc',
-    dirname(__DIR__) . DIRECTORY_SEPARATOR . 'dragonmvc'
+    __DIR__ . DIRECTORY_SEPARATOR . 'dragoncore',
+    dirname(__DIR__) . DIRECTORY_SEPARATOR . 'dragoncore'
 ];
 foreach ($paths as $entry) {
     $entry = rtrim($entry, '/\\');
@@ -110,7 +110,7 @@ $config = <<<'EOD'
  * %d - double (with dot separator)
  * %s - any string (default regex [\w\-]+)
  *
- * @link https://github.com/stefanak-michal/DragonMVC/wiki/Routing
+ * @see docs/routing.md for more details
  */
 $aConfig = [
     'routes' => [
@@ -165,6 +165,7 @@ file_put_contents(BASE_PATH . DS . 'views' . DS . 'homepage' . DS . 'index.phtml
 file_put_contents(BASE_PATH . DS . '.gitignore', '/tmp/
 .htaccess
 .idea
+.vscode
 /config/development/
 ');
 
