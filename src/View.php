@@ -16,11 +16,11 @@ namespace Dragon;
 final class View
 {
     /**
-     * @var string
+     * @var ?string
      */
     private $view;
     /**
-     * @var string
+     * @var ?string
      */
     private $layout;
     /**
@@ -35,7 +35,7 @@ final class View
 
     /**
      * Call after any render (view or layout). It should return modified content.
-     * @var callable (string renderedFile, string content): string
+     * @var ?callable(string renderedFile, string content): string
      */
     public static $afterRender;
 

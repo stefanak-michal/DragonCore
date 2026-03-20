@@ -15,8 +15,8 @@ readonly class Cors implements IMiddleware
 {
     /**
      * @param string $allowedOrigin
-     * @param array $allowedMethods
-     * @param array $allowedHeaders
+     * @param string[] $allowedMethods
+     * @param string[] $allowedHeaders
      * @param int $maxAge  Preflight cache duration in seconds
      */
     public function __construct(
