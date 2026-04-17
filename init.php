@@ -50,7 +50,7 @@ if (IS_CLI) {
 
 if (!defined('DRAGON_DEBUG')) {
     if (\Dragon\Config::gi()->get('debug') !== null) {
-        $debug = \Dragon\Config::gi()->get('debug') == 1;
+        $debug = !empty(\Dragon\Config::gi()->get('debug'));
     } else {
         $debug = IS_WORKSPACE;
     }
