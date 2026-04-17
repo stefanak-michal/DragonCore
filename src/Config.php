@@ -55,61 +55,36 @@ final class Config
         if (!self::$instance instanceof self) {
             self::$instance = new Config();
 
-            $names = [];
-            $fn = function (string $file) use (&$names) {
-                if (substr($file, -strlen(self::$cfgAffix)) == self::$cfgAffix) {
-                    self::$instance->loadFile(pathinfo($file, PATHINFO_BASENAME));
-                    $names[] = pathinfo($file, PATHINFO_BASENAME);
-                } elseif (substr($file, -strlen(self::$ltAffix)) == self::$ltAffix) {
-                    self::$instance->loadFile(pathinfo($file, PATHINFO_BASENAME), 'lookUpTables');
-                    $names[] = pathinfo($file, PATHINFO_BASENAME);
-                }
-            };
+            if (file_exists(CORE_PATH . DS . 'config' . DS)) {
+                $dir = new \RecursiveDirectoryIterator(CORE_PATH . DS . 'config' . DS);
+                $iterator = new \RecursiveIteratorIterator($dir);
+                $regex = new \RegexIterator($iterator, '/^.+\.php$/i', \RecursiveRegexIterator::MATCH);
 
-            foreach (glob(CORE_PATH . DS . 'config' . DS . '*.php') as $file) {
-                $fn($file);
+                foreach ($regex as $file) {
+                    if (substr($file, -strlen(self::$cfgAffix)) === self::$cfgAffix) {
+                        self::$instance->loadConfig($file);
+                    } elseif (substr($file, -strlen(self::$ltAffix)) == self::$ltAffix) {
+                        self::$instance->loadLookupTable($file);
+                    }
+                }
             }
+    
+            if (file_exists(APP_PATH . DS . 'config' . DS)) {
+                $dir = new \RecursiveDirectoryIterator(APP_PATH . DS . 'config' . DS);
+                $iterator = new \RecursiveIteratorIterator($dir);
+                $regex = new \RegexIterator($iterator, '/^.+\.php$/i', \RecursiveRegexIterator::MATCH);
 
-            foreach (glob(APP_PATH . DS . 'config' . DS . '*.php') as $file) {
-                if (in_array(pathinfo($file, PATHINFO_BASENAME), $names)) {
-                    continue;
+                foreach ($regex as $file) {
+                    if (substr($file, -strlen(self::$cfgAffix)) === self::$cfgAffix) {
+                        self::$instance->loadConfig($file);
+                    } elseif (substr($file, -strlen(self::$ltAffix)) == self::$ltAffix) {
+                        self::$instance->loadLookupTable($file);
+                    }
                 }
-                $fn($file);
             }
         }
 
         return self::$instance;
-    }
-
-    /**
-     * Load config files
-     *
-     * @param string $filename
-     * @param string $objVar
-     */
-    private function loadFile(string $filename, string $objVar = 'configVars')
-    {
-        $files = [
-            CORE_PATH . DS . 'config' . DS . $filename,
-            CORE_PATH . DS . 'config' . DS . (IS_WORKSPACE ? 'development' : 'production') . DS . $filename,
-            APP_PATH . DS . 'config' . DS . $filename,
-            APP_PATH . DS . 'config' . DS . (IS_WORKSPACE ? 'development' : 'production') . DS . $filename,
-        ];
-
-        foreach ($files as $file) {
-            if (!file_exists($file)) {
-                continue;
-            }
-
-            Debug::files($file);
-
-            (function () use ($file, $objVar) {
-                include $file;
-                $defined = get_defined_vars();
-                unset($defined['file'], $defined['objVar']);
-                $this->{$objVar} = array_replace_recursive($this->{$objVar}, reset($defined));
-            })();
-        }
     }
 
     /**
@@ -172,6 +147,54 @@ final class Config
         }
 
         return $output;
+    }
+
+    /**
+     * Load lookup table file
+     *
+     * @param string $filepath
+     * @return bool
+     */
+    public function loadLookupTable(string $filepath): bool
+    {
+        if (file_exists($filepath)) {
+            Debug::files($filepath);
+
+            (function () use ($filepath) {
+                include $filepath;
+                $defined = get_defined_vars();
+                unset($defined['filepath']);
+                $this->lookUpTables = array_replace_recursive($this->lookUpTables, reset($defined));
+            })();
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Load config file
+     *
+     * @param string $filepath
+     * @return bool
+     */
+    public function loadConfig(string $filepath): bool
+    {
+        if (file_exists($filepath)) {
+            Debug::files($filepath);
+
+            (function () use ($filepath) {
+                include $filepath;
+                $defined = get_defined_vars();
+                unset($defined['filepath']);
+                $this->configVars = array_replace_recursive($this->configVars, reset($defined));
+            })();
+
+            return true;
+        }
+
+        return false;
     }
 
     /**

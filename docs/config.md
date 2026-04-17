@@ -48,3 +48,7 @@ $pi = \Dragon\Config::gi()->lt('math.pi');
 Config class contains static method `apply`. This method accept first argument instance of any class and second argument key from loaded configuration. Main purpose is to call on class, where you want to set up different properties. 
 
 Look into [Email](emails.md), and you can see usage of it in `\Dragon\components\Email->_send()`.
+
+# TODO
+
+add informations about loadLookupTable and loadConfig methods
