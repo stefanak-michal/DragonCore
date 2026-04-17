@@ -127,7 +127,7 @@ file_put_contents(BASE_PATH . DS . 'controllers' . DS . 'Homepage.php', '<?php
 
 namespace controllers;
 
-use Dragon\IController;
+use Dragon\controllers\IController;
 
 /**
  * Class Homepage
@@ -136,16 +136,16 @@ use Dragon\IController;
 class Homepage implements IController
 {
 
-    public function index(\http\Request $request, \http\Response $response): \http\Response
+    public function index(\Dragon\http\Request $request, \Dragon\http\Response $response): \Dragon\http\Response
     {
-        \core\View::gi()->set("msg", "Hello ' . basename(BASE_PATH) . '!");
+        \Dragon\View::gi()->set("msg", "Hello ' . basename(BASE_PATH) . '!");
         return $response;
     }
 
     public function middleware(): array
     {
         return [
-            new \middleware\Render(),
+            new \Dragon\middleware\Render(),
         ];
     }
 }
