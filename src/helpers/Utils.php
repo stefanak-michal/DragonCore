@@ -108,43 +108,21 @@ class Utils
     }
 
     /**
-     * Get request header by key
-     *
-     * @param string $key
-     * @param boolean $lowercase
-     * @return mixed
-     */
-    public static function requestHeader(string $key, bool $lowercase = true)
-    {
-        $headers = apache_request_headers();
-
-        if ($lowercase) {
-            $headers = array_flip($headers);
-            $headers = array_map('strtolower', $headers);
-            $headers = array_flip($headers);
-            $key = strtolower($key);
-        }
-
-        return $headers[$key] ?? false;
-    }
-
-    /**
      * Simple cURL GET or POST request
      *
      * @param string $url
-     * @param array $data
+     * @param array $data POST data, leave empty for GET
+     * @param array $options cURL options
      * @return mixed Returns false if request was not successful
      */
-    public static function cURL(string $url, array $data = [])
+    public static function cURL(string $url, array $data = [], array $options = [])
     {
         $ch = curl_init();
 
-        $opts = [
+        $opts = array_merge([
             CURLOPT_URL => $url,
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_SSL_VERIFYHOST => false,
-            CURLOPT_SSL_VERIFYPEER => false,
-        ];
+        ], $options);
 
         if (!empty($data)) {
             $opts[CURLOPT_POST] = true;

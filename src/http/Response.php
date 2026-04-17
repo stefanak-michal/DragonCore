@@ -94,10 +94,10 @@ class Response
      * @param int $flags  JSON encoding flags
      * @return static
      */
-    public function json(mixed $data, int $flags = 0): static
+    public function json(mixed $data, int $flags = JSON_THROW_ON_ERROR): static
     {
         $this->headers['Content-Type'] = 'application/json';
-        $this->body = json_encode($data, $flags);
+        $this->body = (string)json_encode($data, $flags);
         return $this;
     }
 

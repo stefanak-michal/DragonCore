@@ -36,7 +36,7 @@ class Csrf implements IMiddleware
             $token = $request->input(self::TOKEN_KEY) ?? $request->header('X-CSRF-Token');
             $stored = \Dragon\helpers\Session::get(self::TOKEN_KEY);
 
-            if ($stored === null || $stored === '' || $token === null || $token === '' || !hash_equals($stored, (string) $token)) {
+            if (!is_string($stored) || empty($stored) || !hash_equals($stored, (string) $token)) {
                 return $response->status(403)->body('CSRF token mismatch');
             }
         }

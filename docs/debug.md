@@ -10,7 +10,7 @@ This report is also visible during redirect (development environment).
 ### var_dump
 
 ```php
-\core\Debug::var_dump(...$args);
+\Dragon\Debug::var_dump(...$args);
 ```
 
 Write any variable to log.  
@@ -19,7 +19,7 @@ This method has global alias `dump()`.
 ### timer
 
 ```php
-\core\Debug::timer($key);
+\Dragon\Debug::timer($key);
 ```
 
 Measure execution time of script part. Don't forget call it second time to stop the timer.  
@@ -28,7 +28,7 @@ All open timers are automatically closed before generating report.
 ### files
 
 ```php
-\core\Debug::files($file);
+\Dragon\Debug::files($file);
 ```
 
 Log loaded file. Used by core to log loaded classes and views.
@@ -36,7 +36,7 @@ Log loaded file. Used by core to log loaded classes and views.
 ### query
 
 ```php
-\core\Debug::query($query, $hidden = [], $otherColumns = []);
+\Dragon\Debug::query($query, $hidden = [], $otherColumns = []);
 ``` 
 
 # Toolbar
@@ -44,7 +44,7 @@ Log loaded file. Used by core to log loaded classes and views.
 You can also generate report as toolbar which can be inserted into website.
 
 ```php
-\core\Debug::onsite()
+\Dragon\Debug::onsite()
 ```
 
 This toolbar is automatically inserted if you will use `\Dragon\middleware\Render`.

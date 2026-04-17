@@ -6,5 +6,14 @@ Main goal is to keep it simple and lightweight. You can use framework project st
 
 If you need to just load the framework without executing controllers logic, write `$autorun = false;` before `init.php` include.
 
+## Topics
+
+- [Controllers](controllers.md)
+- [Middleware](middleware.md)
+- [Routing](routing.md)
+- [Views and elements](views-and-elements.md)
+- [Config](config.md)
+- [Debug](debug.md)
+
 ### Framework requires:
 - short_open_tag = On

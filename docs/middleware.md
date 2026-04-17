@@ -1,6 +1,6 @@
 # Middleware
 
-Middleware wraps controller method execution, allowing you to run logic before and/or after the action.
+Middleware wraps controller method execution, allowing you to run logic before and/or after the action. For the controller method signature and the role of `Request` and `Response`, see [controllers](controllers.md).
 
 ## Interface
 
@@ -13,11 +13,17 @@ Calling `$next()` passes control to the next middleware in the stack, or to the 
 Controllers declare their middleware stack by implementing `\Dragon\controllers\IController`:
 
 ```php
-class Homepage implements \controllers\IController
+use Dragon\controllers\IController;
+use Dragon\http\Request;
+use Dragon\http\Response;
+
+class Homepage implements IController
 {
-    public function index()
+    public function index(Request $request, Response $response): Response
     {
-        \core\View::gi()->set('msg', 'Hello!');
+        \Dragon\View::gi()->set('msg', 'Hello!');
+
+        return $response;
     }
 
     public function middleware(): array
@@ -31,14 +37,20 @@ class Homepage implements \controllers\IController
 
 _Middleware is executed in the order it is returned._
 
+The same `Request` and `Response` objects are passed through the middleware chain and into the controller action. Middleware can inspect request data before the action runs and can also modify the response returned by the controller.
+
 ## Middleware dependency
 
-It is possible to define that one middleware depends on another one. For that reason attribute `RequireMiddleware` has to be used. Then if we want to use middleware with dependency, before it the dependency has to be added. Otherwise it will generate runtime exception.
+It is possible to define that one middleware depends on another one. For that reason attribute `RequiresMiddleware` has to be used. Then if we want to use middleware with dependency, before it the dependency has to be added. Otherwise it will generate runtime exception.
 
 ### Example
 
 ```php
 // Middleware definition
+
+use Dragon\middleware\RequiresMiddleware;
+use Dragon\middleware\Session;
+use Dragon\middleware\IMiddleware;
 
 #[RequiresMiddleware(Session::class)]
 class Csrf implements IMiddleware {
@@ -49,7 +61,7 @@ class Csrf implements IMiddleware {
 public function middleware(): array
 {
     return [
-        new \Dragon\middleware\Session(),
+        new \Dragon\middleware\Session(), // session has to be first, because it's required by Csrf
         new \Dragon\middleware\Csrf()
     ];
 }

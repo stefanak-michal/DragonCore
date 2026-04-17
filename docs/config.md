@@ -8,7 +8,7 @@ System is auto loading all files in config directory.
 
 ## Class Config
 
-Is available with singleton method `\Drargon\Config::gi()`.
+Is available with singleton method `\Dragon\Config::gi()`.
 
 File extensions for config files can be changed on static properties:
 - cfgAffix - default `.cfg.php`

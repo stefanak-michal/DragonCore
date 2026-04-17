@@ -4,14 +4,14 @@
 
 You can make a call to register assets. Each argument has to be a path to asset file relative to assets directory. 
 ```php
-\helpers\Assets::add('css/default.css');
+\Dragon\helpers\Assets::add('css/default.css');
 ``` 
 
 _Helper class does supports css and js files._
 
 To render html tags with registered assets, you can place in `<head>` in layout file following call:
 ```php
-<?= helpers\Assets::draw() ?>
+<?= \Dragon\helpers\Assets::draw() ?>
 ```
 
 ## Versioning

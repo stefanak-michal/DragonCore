@@ -2,6 +2,8 @@
 
 namespace Dragon\controllers;
 
+use Dragon\middleware\IMiddleware;
+
 /**
  * Interface IController
  *
@@ -14,7 +16,7 @@ interface IController
     /**
      * Return the middleware stack to be executed around the controller method
      *
-     * @return \middleware\IMiddleware[]
+     * @return IMiddleware[]
      */
     public function middleware(): array;
 }

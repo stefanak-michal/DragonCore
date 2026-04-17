@@ -12,7 +12,7 @@
 
 ## src/controllers
 - Main application logic.
-- Controller classes needs to implements `\Dragon\controllers\IController` interface.
+- Controller classes need to implement `\Dragon\controllers\IController` interface. See [controllers](controllers.md).
 
 ## src/helpers
 - Classes with usually helping static methods.

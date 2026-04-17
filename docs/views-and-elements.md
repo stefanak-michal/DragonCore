@@ -6,9 +6,9 @@ None! Why to add more complexity and slowness? You can write html and insert php
 
 ## View & Layout
 
-To render vies and layouts you have to use `\Dragon\View` class. It has dual usage:
+To render views and layouts you have to use `\Dragon\View` class. It has dual usage:
 - Singleton - it's the main instance for controller->method logic `\Dragon\View::gi()`
-- Instantiation - when you need to render any view `new \Dragono\View()`
+- Instantiation - when you need to render any view `new \Dragon\View()`
 
 In the description below is used _`<View>`_ because of two different options to access instance of this class.
 
@@ -45,7 +45,7 @@ You have a option to not use view or layout with set null. If view is a null, la
 To render a element you need to instantiate class View.
 
 Example:  
-`echo (new \core\View('elements/bar'))->render();`
+`echo (new \Dragon\View('elements/bar'))->render();`
 
 Rendered element will be  
 `<root>/views/elements/bar.phtml`  
