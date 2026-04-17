@@ -34,8 +34,9 @@ class Csrf implements IMiddleware
             \Dragon\http\RequestMethod::DELETE,
         ])) {
             $token = $request->input(self::TOKEN_KEY) ?? $request->header('X-CSRF-Token');
+            $stored = \Dragon\helpers\Session::get(self::TOKEN_KEY);
 
-            if ($token !== \Dragon\helpers\Session::get(self::TOKEN_KEY)) {
+            if ($stored === null || $stored === '' || $token === null || $token === '' || !hash_equals($stored, (string) $token)) {
                 return $response->status(403)->body('CSRF token mismatch');
             }
         }
