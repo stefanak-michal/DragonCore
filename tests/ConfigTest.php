@@ -1,14 +1,30 @@
 <?php
+
 use PHPUnit\Framework\TestCase;
 use Dragon\Config;
 
+/**
+ * ConfigTest
+ *
+ * @author Michal Stefanak
+ * @link https://github.com/stefanak-michal/DragonCore
+ */
 class ConfigTest extends TestCase
 {
     public static function setUpBeforeClass(): void
     {
-        define('DS', DIRECTORY_SEPARATOR);
-        define('CORE_PATH', dirname(__DIR__) . DS . 'src');
-        define('APP_PATH', __DIR__);
+        if (!defined('DS')) {
+            define('DS', DIRECTORY_SEPARATOR);
+        }
+        if (!defined('CORE_PATH')) {
+            define('CORE_PATH', dirname(__DIR__) . DS . 'src');
+        }
+        if (!defined('APP_PATH')) {
+            define('APP_PATH', __DIR__);
+        }
+
+        $ref = new ReflectionClass(Config::class);
+        $ref->getProperty('instance')->setValue(null, null);
     }
 
     public static function tearDownAfterClass(): void
@@ -42,9 +58,7 @@ class ConfigTest extends TestCase
 
     public function testSingleton(): void
     {
-        $config1 = Config::gi();
-        $config2 = Config::gi();
-        $this->assertSame($config1, $config2);
+        $this->assertSame(Config::gi(), Config::gi());
     }
 
     public function testLt(): void
@@ -68,7 +82,8 @@ class ConfigTest extends TestCase
         $obj = new class {
             public string $name;
             public string $version;
-            public function updateVersion() {
+            public function updateVersion()
+            {
                 $this->version = '2.0';
             }
         };
