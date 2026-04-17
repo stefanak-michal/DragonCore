@@ -47,10 +47,12 @@ final class View
      */
     public function __construct(string $view = '', array $vars = [], string $layout = '')
     {
-        if (!empty($view))
+        if (!empty($view)) {
             $this->view($view);
-        if (!empty($layout))
+        }
+        if (!empty($layout)) {
             $this->layout($layout);
+        }
         $this->vars($vars);
     }
 
@@ -60,8 +62,9 @@ final class View
      */
     public static function gi(): View
     {
-        if (empty(self::$instance))
+        if (empty(self::$instance)) {
             self::$instance = new self();
+        }
 
         return self::$instance;
     }
@@ -135,29 +138,34 @@ final class View
      */
     public function render(): string
     {
-        if (empty($this->view))
+        if (empty($this->view)) {
             return !empty($this->layout) ? $this->layouted('') : '';
+        }
 
         Debug::files($this->view);
 
         ob_start();
 
-        if (!empty($this->vars))
+        if (!empty($this->vars)) {
             extract($this->vars);
+        }
 
         include $this->view;
 
         $content = ob_get_clean();
 
         //after render clean up memory
-        foreach ($this->vars as $key => $variable)
+        foreach ($this->vars as $key => $variable) {
             unset(${$key});
+        }
 
-        if (is_callable(self::$afterRender))
+        if (is_callable(self::$afterRender)) {
             $content = call_user_func(self::$afterRender, $this->view, $content);
+        }
 
-        if (!empty($this->layout))
+        if (!empty($this->layout)) {
             $content = $this->layouted($content);
+        }
 
         return $content;
     }
@@ -172,19 +180,22 @@ final class View
 
         ob_start();
 
-        if (!empty($this->vars))
+        if (!empty($this->vars)) {
             extract($this->vars);
+        }
 
         include $this->layout;
 
         $html = ob_get_clean();
 
         //after render clean up memory
-        foreach ($this->vars as $key => $variable)
+        foreach ($this->vars as $key => $variable) {
             unset(${$key});
+        }
 
-        if (is_callable(self::$afterRender))
+        if (is_callable(self::$afterRender)) {
             $html = call_user_func(self::$afterRender, $this->layout, $html);
+        }
 
         return $html;
     }
@@ -196,29 +207,34 @@ final class View
      */
     private function path(string $str): string
     {
-        if (empty($str))
+        if (empty($str)) {
             return '';
+        }
 
         $str = str_replace(array('/', "\\"), DS, $str);
         $ext = '.' . ltrim(Config::gi()->get('viewsExtension', 'phtml'), '.');
-        if (substr($str, 0, -strlen($ext)) != $ext)
+        if (substr($str, 0, -strlen($ext)) != $ext) {
             $str .= $ext;
+        }
 
         $viewDirectory = trim(str_replace(array('/', "\\"), DS, Config::gi()->get('viewsDirectory', 'views')), DS);
 
-        if (substr($str, 0, 1) == DS)
+        if (substr($str, 0, 1) == DS) {
             $output = BASE_PATH . $str;
-        else
+        } else {
             $output = BASE_PATH . DS . $viewDirectory . DS . $str;
+        }
 
         if (!file_exists($output)) {
-            if (substr($str, 0, 1) == DS)
+            if (substr($str, 0, 1) == DS) {
                 $output = DRAGON_PATH . $str;
-            else
+            } else {
                 $output = DRAGON_PATH . DS . $viewDirectory . DS . $str;
+            }
 
-            if (!file_exists($output))
+            if (!file_exists($output)) {
                 $output = '';
+            }
         }
 
         return $output;

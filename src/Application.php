@@ -3,8 +3,8 @@
 namespace Dragon;
 
 /**
- * Framework
- * Base class of MVC framework
+ * Application
+ * Base class of framework
  *
  * @package Dragon
  * @author Michal Stefanak
@@ -78,15 +78,17 @@ final class Application
     private function loadController(array $cmv)
     {
         //if we have nothing to do, then quit
-        if (empty($cmv) or empty($cmv['controller']) or empty($cmv['method']))
+        if (empty($cmv) or empty($cmv['controller']) or empty($cmv['method'])) {
             throw new \RuntimeException('Route resolved to empty controller or method');
+        }
 
         self::$method = $cmv['method'];
 
         $last = ucfirst(array_pop($cmv['controller']));
         $className = "\\" . implode("\\", $cmv['controller']) . "\\" . $last;
-        if (!class_exists($className))
+        if (!class_exists($className)) {
             throw new \RuntimeException("Controller class $className not found");
+        }
 
         self::$controller = new $className();
     }

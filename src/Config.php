@@ -71,8 +71,9 @@ final class Config
             }
 
             foreach (glob(BASE_PATH . DS . 'config' . DS . '*.php') as $file) {
-                if (in_array(pathinfo($file, PATHINFO_BASENAME), $names))
+                if (in_array(pathinfo($file, PATHINFO_BASENAME), $names)) {
                     continue;
+                }
                 $fn($file);
             }
         }
@@ -96,8 +97,9 @@ final class Config
         ];
 
         foreach ($files as $file) {
-            if (!file_exists($file))
+            if (!file_exists($file)) {
                 continue;
+            }
 
             Debug::files($file);
 
@@ -153,8 +155,9 @@ final class Config
      */
     public function lt(string $dotSeparatedKeys)
     {
-        if (empty($dotSeparatedKeys))
+        if (empty($dotSeparatedKeys)) {
             return null;
+        }
 
         $output = array();
 

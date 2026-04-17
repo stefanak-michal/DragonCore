@@ -43,8 +43,9 @@ final class Router
      */
     public static function gi(): Router
     {
-        if (self::$instance == null)
+        if (self::$instance == null) {
             self::$instance = new Router();
+        }
 
         return self::$instance;
     }
@@ -82,17 +83,20 @@ final class Router
                     $controller = 'controllers/' . $controller;
 
                 foreach ($value as $mask => $route) {
-                    if (!is_string($mask))
+                    if (!is_string($mask)) {
                         $mask = $key . '/' . $route;
+                    }
                     $this->routes[$mask] = $controller . '/' . $route;
                 }
             } else {
-                if (!is_string($key))
+                if (!is_string($key)) {
                     $key = $value;
+                }
 
                 $value = str_replace('\\', '/', $value);
-                if (strpos($value, 'controllers') !== 0)
+                if (strpos($value, 'controllers') !== 0) {
                     $value = 'controllers/' . $value;
+                }
 
                 $this->routes[$key] = $value;
             }
@@ -128,8 +132,9 @@ final class Router
 
         if (is_string($cmv['controller'])) {
             $cmv['controller'] = array_filter(explode('/', str_replace('\\', '/', $cmv['controller'])));
-            if (reset($cmv['controller']) !== 'controllers')
+            if (reset($cmv['controller']) !== 'controllers') {
                 array_unshift($cmv['controller'], 'controllers');
+            }
         }
 
         $path = $this->extractPath();
@@ -211,8 +216,9 @@ final class Router
         $controller = str_replace('\\', '/', $controller);
         foreach ($this->getMasks($controller, $method) as $mask) {
             //check number of defined variables against mask
-            if (count($vars) != preg_match_all('/%[dis]/', $mask))
+            if (count($vars) != preg_match_all('/%[dis]/', $mask)) {
                 continue;
+            }
 
             $this->replaceMaskVariables($mask, $vars);
             $uri = $this->project_host . $mask;
@@ -228,8 +234,9 @@ final class Router
             }
         }
 
-        if (!empty($query))
+        if (!empty($query)) {
             $uri .= '?' . http_build_query($query);
+        }
 
         return $uri;
     }
@@ -240,8 +247,9 @@ final class Router
      */
     private function replaceMaskVariables(string &$mask, array $vars)
     {
-        if (empty($vars))
+        if (empty($vars)) {
             return;
+        }
 
         $i = 0;
         while (preg_match('/%[dis]/', $mask, $match)) {
@@ -322,8 +330,9 @@ final class Router
 
         foreach ($this->routes as $mask => $route) {
             $output = $this->match($path, $mask, $route);
-            if (!empty($output))
+            if (!empty($output)) {
                 break;
+            }
         }
 
         return $output;

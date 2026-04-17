@@ -23,8 +23,9 @@ class Render implements IMiddleware
 
         $content = \Dragon\View::gi()->render();
         $pos = strrpos($content, '</body>');
-        if (IS_WORKSPACE && $pos !== false)
+        if (IS_WORKSPACE && $pos !== false) {
             $content = substr_replace($content, \Dragon\Debug::onsite(), $pos, 0);
+        }
         return $response->html($content);
     }
 
@@ -43,16 +44,18 @@ class Render implements IMiddleware
         ];
 
         $snake_case = [];
-        foreach ($controller as $part)
+        foreach ($controller as $part) {
             $snake_case[] = \Dragon\helpers\Utils::snake_case($part);
+        }
         $possibleViewFile[] = implode('/', $snake_case) . '/' . \Dragon\Application::$method;
         $possibleViewFile[] = implode('/', $snake_case) . '/' . strtolower(\Dragon\Application::$method);
         $possibleViewFile[] =
             implode('/', $snake_case) . '/' . \Dragon\helpers\Utils::snake_case(\Dragon\Application::$method);
 
         foreach ($possibleViewFile as $viewFile) {
-            if (\Dragon\View::gi()->view($viewFile))
+            if (\Dragon\View::gi()->view($viewFile)) {
                 break;
+            }
         }
     }
 }

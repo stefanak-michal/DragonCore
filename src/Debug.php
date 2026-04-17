@@ -33,8 +33,9 @@ final class Debug
     private static function init(): bool
     {
         if (self::$initialized == 0) {
-            if (!defined('DRAGON_DEBUG'))
+            if (!defined('DRAGON_DEBUG')) {
                 return false;
+            }
 
             self::$initialized = DRAGON_DEBUG ? 1 : 2;
         }
@@ -48,8 +49,9 @@ final class Debug
      */
     public static function var_dump(...$args)
     {
-        if (self::init())
+        if (self::init()) {
             return;
+        }
 
         if (!empty($args)) {
             foreach ($args as $one) {
@@ -70,8 +72,9 @@ final class Debug
      */
     public static function files(string $file)
     {
-        if (self::init())
+        if (self::init()) {
             return;
+        }
 
         $exists = file_exists($file);
         $str =
@@ -103,8 +106,9 @@ final class Debug
      */
     public static function timer(string $key)
     {
-        if (self::init())
+        if (self::init()) {
             return;
+        }
 
         if (!isset(self::$timers[$key])) {
             self::$timers[$key] = microtime(true);
@@ -125,8 +129,9 @@ final class Debug
      */
     public static function query(string $query, array $hidden = [], array $otherColumns = [])
     {
-        if (self::init())
+        if (self::init()) {
             return;
+        }
 
         $query = '<details><summary>' . $query . '</summary>';
 
@@ -188,14 +193,16 @@ final class Debug
     public static function generate()
     {
         self::updateHistory();
-        foreach (array_keys(self::$timers) as $key)
+        foreach (array_keys(self::$timers) as $key) {
             self::timer($key);
+        }
 
         $time = microtime(true);
 
         $counts = [];
-        foreach (self::$tables as $key => $table)
+        foreach (self::$tables as $key => $table) {
             $counts[$key] = count($table);
+        }
 
         $html = new View('/views/elements/debug/report', [
             'uri' => IS_CLI ? $GLOBALS['_SERVER']['SCRIPT_NAME'] : $_SERVER['REQUEST_URI'] ?? '',
@@ -251,8 +258,9 @@ final class Debug
         self::$tables[__FUNCTION__] = [];
 
         foreach ($files as $file) {
-            if (strpos($file, 'last.html') > 0)
+            if (strpos($file, 'last.html') > 0) {
                 continue;
+            }
 
             $data = file_get_contents($file);
             preg_match('/URI: <b>([^<]*)/', $data, $match);
@@ -278,8 +286,9 @@ final class Debug
 
         //tabs with tables
         foreach (self::$tables as $key => $table) {
-            if (empty($table))
+            if (empty($table)) {
                 continue;
+            }
 
             $output .= '<table class="' . $class . '" id="' . $key . '" cellspacing="0">';
             $class = '';
@@ -345,12 +354,14 @@ final class Debug
     public static function onsite(): string
     {
         self::updateHistory();
-        foreach (array_keys(self::$timers) as $key)
+        foreach (array_keys(self::$timers) as $key) {
             self::timer($key);
+        }
 
         $counts = [];
-        foreach (self::$tables as $key => $table)
+        foreach (self::$tables as $key => $table) {
             $counts[$key] = count($table);
+        }
 
         return new View('/views/elements/debug/onsite', [
             'cm' => str_replace("controllers\\", '', get_class(Application::$controller)) . '->' . Application::$method,

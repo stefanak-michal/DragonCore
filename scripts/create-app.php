@@ -22,8 +22,9 @@ if (file_exists($argv[1])) {
 }
 
 //realpath works only on existing path
-if (!file_exists($argv[1]))
+if (!file_exists($argv[1])) {
     mkdir($argv[1], 0777, true);
+}
 define('BASE_PATH', realpath($argv[1]));
 
 require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'init.php';

@@ -73,8 +73,9 @@ class Assets
     {
         foreach ($names as $name) {
             $type = pathinfo($name, PATHINFO_EXTENSION);
-            if (array_key_exists($type, self::$toLoad) && array_key_exists($name, self::$toLoad[$type]))
+            if (array_key_exists($type, self::$toLoad) && array_key_exists($name, self::$toLoad[$type])) {
                 unset(self::$toLoad[$type][$name]);
+            }
         }
     }
 
@@ -89,8 +90,9 @@ class Assets
         //auto add "min" on production if the file is available
         if (!IS_WORKSPACE && strpos($name, '.min.') === false) {
             $file = substr_replace($name, '.min.', strrpos($name, '.'), 1);
-            if (file_exists(BASE_PATH . DS . 'assets' . DS . $file))
+            if (file_exists(BASE_PATH . DS . 'assets' . DS . $file)) {
                 $name = $file;
+            }
         }
 
         if (!file_exists(BASE_PATH . DS . 'assets' . DS . str_replace(['/', '\\'], DS, $name))) {
@@ -98,8 +100,9 @@ class Assets
         }
 
         $output = '';
-        if (self::$absoluteUrls)
+        if (self::$absoluteUrls) {
             $output = \Dragon\Router::gi()->getHost();
+        }
         $output .= 'assets/' . $name . '?v=' . filemtime(BASE_PATH . DS . 'assets' . DS . $name);
         return $output;
     }

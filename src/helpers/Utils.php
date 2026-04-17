@@ -154,8 +154,9 @@ class Utils
         curl_setopt_array($ch, $opts);
 
         $response = curl_exec($ch);
-        if (!(curl_getinfo($ch, CURLINFO_RESPONSE_CODE) == 200 && curl_errno($ch) == 0))
+        if (!(curl_getinfo($ch, CURLINFO_RESPONSE_CODE) == 200 && curl_errno($ch) == 0)) {
             $response = false;
+        }
         unset($ch);
 
         return $response;

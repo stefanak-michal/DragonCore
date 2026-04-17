@@ -7,8 +7,9 @@
  * @link https://github.com/stefanak-michal/DragonMVC
  */
 
-if (!defined('DS'))
+if (!defined('DS')) {
     define('DS', DIRECTORY_SEPARATOR);
+}
 
 if (!defined('BASE_PATH')) {
     if (array_key_exists('SCRIPT_FILENAME', $_SERVER)) {
@@ -22,18 +23,21 @@ if (!defined('DRAGON_PATH')) {
     define('DRAGON_PATH', __DIR__ . DS . 'src');
 }
 
-if (file_exists(BASE_PATH . DS . 'vendor' . DS . 'autoload.php'))
+if (file_exists(BASE_PATH . DS . 'vendor' . DS . 'autoload.php')) {
     require_once BASE_PATH . DS . 'vendor' . DS . 'autoload.php';
-if (file_exists(__DIR__ . DS . 'vendor' . DS . 'autoload.php'))
+}
+if (file_exists(__DIR__ . DS . 'vendor' . DS . 'autoload.php')) {
     require_once __DIR__ . DS . 'vendor' . DS . 'autoload.php';
+}
 
 if (!defined('IS_WORKSPACE')) {
     $workspace = false;
     if (
         file_exists(BASE_PATH . DS . 'config' . DS . 'development' . DS)
         || in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'])
-    )
+    ) {
         $workspace = true;
+    }
     define('IS_WORKSPACE', $workspace);
 }
 

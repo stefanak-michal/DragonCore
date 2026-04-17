@@ -176,8 +176,9 @@ class Email
                     . pathinfo($view->getView(), PATHINFO_FILENAME)
                     . DS;
                 foreach ($matches[1] as $match) {
-                    if (file_exists($path . $match))
+                    if (file_exists($path . $match)) {
                         $this->addPicture($path . $match, $match);
+                    }
                 }
             }
 
@@ -220,22 +221,27 @@ class Email
             $mailer = new PHPMailer(true);
             \Dragon\Config::apply('mailer', $mailer);
 
-            if (!empty($this->from))
+            if (!empty($this->from)) {
                 $mailer->setFrom(...$this->from);
-            else
+            } else {
                 $mailer->setFrom(
                     \Dragon\Config::gi()->get('project_email'),
                     \Dragon\Config::gi()->get('project_title'),
                 );
+            }
 
-            foreach ($this->emails as $name => $email)
+            foreach ($this->emails as $name => $email) {
                 $mailer->addAddress($email, is_numeric($name) ? '' : $name);
-            foreach ($this->cc as $name => $email)
+            }
+            foreach ($this->cc as $name => $email) {
                 $mailer->addCC($email, is_numeric($name) ? '' : $name);
-            foreach ($this->bcc as $name => $email)
+            }
+            foreach ($this->bcc as $name => $email) {
                 $mailer->addBCC($email, is_numeric($name) ? '' : $name);
-            foreach ($this->reply as $name => $email)
+            }
+            foreach ($this->reply as $name => $email) {
                 $mailer->addReplyTo($email, is_numeric($name) ? '' : $name);
+            }
 
             $mailer->isHTML(true);
             $mailer->Subject = $this->title;

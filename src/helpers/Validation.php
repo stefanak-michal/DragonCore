@@ -41,16 +41,17 @@ class Validation
     {
         foreach ($data as &$entry) {
             if (is_string($entry)) {
-                if (strlen($entry) == 0)
+                if (strlen($entry) == 0) {
                     $entry = null;
-                elseif ($entry == 'true')
+                } elseif ($entry == 'true') {
                     $entry = true;
-                elseif ($entry == 'false')
+                } elseif ($entry == 'false') {
                     $entry = false;
-                elseif (preg_match("/^(\d|[1-9]\d+)$/", $entry))
+                } elseif (preg_match("/^(\d|[1-9]\d+)$/", $entry)) {
                     $entry = intval($entry);
-                elseif (preg_match("/^\d*\.\d+$/", $entry))
+                } elseif (preg_match("/^\d*\.\d+$/", $entry)) {
                     $entry = floatval($entry);
+                }
             } elseif (is_array($entry)) {
                 self::sanitize($entry);
             }
@@ -67,13 +68,15 @@ class Validation
     {
         if (!empty($keys)) {
             $data = array_intersect_key($data, array_flip($keys));
-            if (count($data) != count($keys))
+            if (count($data) != count($keys)) {
                 return false;
+            }
         }
 
         foreach ($data as $value) {
-            if (empty($value))
+            if (empty($value)) {
                 return false;
+            }
         }
 
         return true;
