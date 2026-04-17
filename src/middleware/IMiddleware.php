@@ -16,7 +16,7 @@ interface IMiddleware
      *
      * @param \Dragon\http\Request $request
      * @param \Dragon\http\Response $response
-     * @param callable(): \Dragon\http\Response $next
+     * @param callable(\Dragon\http\Response): \Dragon\http\Response $next
      * @return \Dragon\http\Response
      */
     public function handle(

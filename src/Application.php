@@ -49,7 +49,7 @@ final class Application
 
         $this->validateMiddlewareDependencies($middlewares);
 
-        $action = function () use ($request, $response) {
+        $action = function (\Dragon\http\Response $response) use ($request) {
             if (method_exists(self::$controller, self::$method)) {
                 Debug::timer('Controller logic');
                 $response = self::$controller->{self::$method}($request, $response);
@@ -60,15 +60,15 @@ final class Application
 
         $pipeline = array_reduce(
             array_reverse($middlewares),
-            function (callable $carry, \Dragon\middleware\IMiddleware $middleware) use ($request, $response) {
-                return function () use ($middleware, $carry, $request, $response) {
+            function (callable $carry, \Dragon\middleware\IMiddleware $middleware) use ($request) {
+                return function (\Dragon\http\Response $response) use ($middleware, $carry, $request) {
                     return $middleware->handle($request, $response, $carry);
                 };
             },
             $action,
         );
 
-        $response = $pipeline();
+        $response = $pipeline($response);
         $response->send();
     }
 

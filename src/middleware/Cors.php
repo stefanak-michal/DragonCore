@@ -41,6 +41,6 @@ readonly class Cors implements IMiddleware
             return $response->status(204);
         }
 
-        return $next();
+        return $next($response);
     }
 }

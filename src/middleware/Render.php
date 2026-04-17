@@ -19,7 +19,7 @@ class Render implements IMiddleware
     ): \Dragon\http\Response {
         $this->trySetView();
 
-        $response = $next();
+        $response = $next($response);
 
         $content = \Dragon\View::gi()->render();
         $pos = strrpos($content, '</body>');

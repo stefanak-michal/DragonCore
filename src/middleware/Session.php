@@ -17,6 +17,6 @@ class Session implements IMiddleware
         callable $next,
     ): \Dragon\http\Response {
         \Dragon\helpers\Session::start();
-        return $next();
+        return $next($response);
     }
 }

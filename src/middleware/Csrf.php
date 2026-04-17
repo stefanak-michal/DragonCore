@@ -45,7 +45,7 @@ class Csrf implements IMiddleware
             \Dragon\helpers\Session::set(self::TOKEN_KEY, bin2hex(random_bytes(32)));
         }
 
-        return $next();
+        return $next($response);
     }
 
     /**
