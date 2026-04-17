@@ -11,7 +11,7 @@ if (!defined('DS')) {
 }
 
 if (!defined('APP_PATH')) {
-    define('APP_PATH', get_included_files()[0]);
+    define('APP_PATH', dirname(get_included_files()[0]));
 }
 
 if (!defined('CORE_PATH')) {
