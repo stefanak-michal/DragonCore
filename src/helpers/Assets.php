@@ -90,12 +90,12 @@ class Assets
         //auto add "min" on production if the file is available
         if (!IS_WORKSPACE && strpos($name, '.min.') === false) {
             $file = substr_replace($name, '.min.', strrpos($name, '.'), 1);
-            if (file_exists(BASE_PATH . DS . 'assets' . DS . $file)) {
+            if (file_exists(APP_PATH . DS . 'assets' . DS . $file)) {
                 $name = $file;
             }
         }
 
-        if (!file_exists(BASE_PATH . DS . 'assets' . DS . str_replace(['/', '\\'], DS, $name))) {
+        if (!file_exists(APP_PATH . DS . 'assets' . DS . str_replace(['/', '\\'], DS, $name))) {
             return '';
         }
 
@@ -103,7 +103,7 @@ class Assets
         if (self::$absoluteUrls) {
             $output = \Dragon\Router::gi()->getHost();
         }
-        $output .= 'assets/' . $name . '?v=' . filemtime(BASE_PATH . DS . 'assets' . DS . $name);
+        $output .= 'assets/' . $name . '?v=' . filemtime(APP_PATH . DS . 'assets' . DS . $name);
         return $output;
     }
 

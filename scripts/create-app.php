@@ -61,7 +61,7 @@ $index = <<<'EOD'
 
 $path = '';
 $paths = [
-    getenv('DRAGON_PATH'),
+    getenv('DRAGONCORE_PATH'),
     __DIR__ . DIRECTORY_SEPARATOR . 'dragoncore',
     dirname(__DIR__) . DIRECTORY_SEPARATOR . 'dragoncore'
 ];
@@ -73,13 +73,13 @@ foreach ($paths as $entry) {
     }
 }
 
-if (empty($path))
-    exit('DragonMVC core not found. Define global system variable DRAGON_PATH with path to it.');
+if (empty($path)) {
+    exit('DragonCore not found. Define global system variable DRAGONCORE_PATH with path to it.');
+}
 
-define('DRAGON_PATH', $path);
-define('BASE_PATH', __DIR__);
+define('APP_PATH', __DIR__);
 
-include_once DRAGON_PATH . DIRECTORY_SEPARATOR . 'init.php';
+include_once $path . DIRECTORY_SEPARATOR . 'init.php';
 
 EOD;
 file_put_contents(BASE_PATH . DS . 'index.php', $index);
@@ -126,6 +126,8 @@ file_put_contents(BASE_PATH . DS . 'config' . DS . 'routes.cfg.php', $config);
 file_put_contents(BASE_PATH . DS . 'controllers' . DS . 'Homepage.php', '<?php
 
 namespace controllers;
+
+use Dragon\IController;
 
 /**
  * Class Homepage

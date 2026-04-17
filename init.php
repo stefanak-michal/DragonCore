@@ -1,30 +1,25 @@
 <?php
-
 /**
  * Project initialization script
  *
  * @author Michal Stefanak
- * @link https://github.com/stefanak-michal/DragonMVC
+ * @link https://github.com/stefanak-michal/DragonCore
  */
 
 if (!defined('DS')) {
     define('DS', DIRECTORY_SEPARATOR);
 }
 
-if (!defined('BASE_PATH')) {
-    if (array_key_exists('SCRIPT_FILENAME', $_SERVER)) {
-        define('BASE_PATH', pathinfo($_SERVER['SCRIPT_FILENAME'], PATHINFO_DIRNAME));
-    } else {
-        define('BASE_PATH', __DIR__);
-    }
+if (!defined('APP_PATH')) {
+    define('APP_PATH', get_included_files()[0]);
 }
 
-if (!defined('DRAGON_PATH')) {
-    define('DRAGON_PATH', __DIR__ . DS . 'src');
+if (!defined('CORE_PATH')) {
+    define('CORE_PATH', __DIR__ . DS . 'src');
 }
 
-if (file_exists(BASE_PATH . DS . 'vendor' . DS . 'autoload.php')) {
-    require_once BASE_PATH . DS . 'vendor' . DS . 'autoload.php';
+if (file_exists(APP_PATH . DS . 'vendor' . DS . 'autoload.php')) {
+    require_once APP_PATH . DS . 'vendor' . DS . 'autoload.php';
 }
 if (file_exists(__DIR__ . DS . 'vendor' . DS . 'autoload.php')) {
     require_once __DIR__ . DS . 'vendor' . DS . 'autoload.php';
@@ -33,7 +28,7 @@ if (file_exists(__DIR__ . DS . 'vendor' . DS . 'autoload.php')) {
 if (!defined('IS_WORKSPACE')) {
     $workspace = false;
     if (
-        file_exists(BASE_PATH . DS . 'config' . DS . 'development' . DS)
+        file_exists(APP_PATH . DS . 'config' . DS . 'development' . DS)
         || in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'])
     ) {
         $workspace = true;

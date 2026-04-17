@@ -12,10 +12,10 @@
 
 ## How to start
 
-1. Use composer to create project with framework `composer create-project stefanak-michal/dragonmvc` or download [latest release](https://github.com/stefanak-michal/DragonCore/releases/latest).
-2. Open cmd/bash in framework root directory and execute `php -f scripts/create-app.php ../new-app`
-3. Now your application with basic hierarchy is ready in directory `new-app` next to framework directory
-3. Open http://localhost/new-app in your browser and you will see page with `Hello new-app!`
+1. Use composer to create project with framework `composer create-project stefanak-michal/dragoncore`.
+2. Open cmd/bash in framework root directory and execute `php -f scripts/create-app.php ../new-app`.
+3. Now your application with basic hierarchy is ready in directory `new-app` next to framework directory.
+3. Open http://localhost/new-app in your browser and you will see page with `Hello new-app!` (of course if you work within htdocs).
 
 Check [documentation](docs/home.md) for more informations.
 

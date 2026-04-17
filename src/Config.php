@@ -66,11 +66,11 @@ final class Config
                 }
             };
 
-            foreach (glob(DRAGON_PATH . DS . 'config' . DS . '*.php') as $file) {
+            foreach (glob(CORE_PATH . DS . 'config' . DS . '*.php') as $file) {
                 $fn($file);
             }
 
-            foreach (glob(BASE_PATH . DS . 'config' . DS . '*.php') as $file) {
+            foreach (glob(APP_PATH . DS . 'config' . DS . '*.php') as $file) {
                 if (in_array(pathinfo($file, PATHINFO_BASENAME), $names)) {
                     continue;
                 }
@@ -90,10 +90,10 @@ final class Config
     private function loadFile(string $filename, string $objVar = 'configVars')
     {
         $files = [
-            DRAGON_PATH . DS . 'config' . DS . $filename,
-            DRAGON_PATH . DS . 'config' . DS . (IS_WORKSPACE ? 'development' : 'production') . DS . $filename,
-            BASE_PATH . DS . 'config' . DS . $filename,
-            BASE_PATH . DS . 'config' . DS . (IS_WORKSPACE ? 'development' : 'production') . DS . $filename,
+            CORE_PATH . DS . 'config' . DS . $filename,
+            CORE_PATH . DS . 'config' . DS . (IS_WORKSPACE ? 'development' : 'production') . DS . $filename,
+            APP_PATH . DS . 'config' . DS . $filename,
+            APP_PATH . DS . 'config' . DS . (IS_WORKSPACE ? 'development' : 'production') . DS . $filename,
         ];
 
         foreach ($files as $file) {

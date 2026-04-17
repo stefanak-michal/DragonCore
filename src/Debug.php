@@ -217,8 +217,8 @@ final class Debug
         ])->render();
 
         $filename = sprintf('%.4f', $time) . '.html';
-        file_put_contents(BASE_PATH . DS . 'tmp' . DS . 'debug' . DS . $filename, $html);
-        file_put_contents(BASE_PATH . DS . 'tmp' . DS . 'debug' . DS . 'last.html', $html);
+        file_put_contents(APP_PATH . DS . 'tmp' . DS . 'debug' . DS . $filename, $html);
+        file_put_contents(APP_PATH . DS . 'tmp' . DS . 'debug' . DS . 'last.html', $html);
 
         self::$tables = [];
     }
@@ -228,7 +228,7 @@ final class Debug
      */
     private static function updateHistory()
     {
-        $path = BASE_PATH . DS . 'tmp' . DS . 'debug' . DS;
+        $path = APP_PATH . DS . 'tmp' . DS . 'debug' . DS;
         if (!file_exists($path)) {
             mkdir($path, 0777, true);
         }

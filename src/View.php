@@ -220,16 +220,16 @@ final class View
         $viewDirectory = trim(str_replace(array('/', "\\"), DS, Config::gi()->get('viewsDirectory', 'views')), DS);
 
         if (substr($str, 0, 1) == DS) {
-            $output = BASE_PATH . $str;
+            $output = APP_PATH . $str;
         } else {
-            $output = BASE_PATH . DS . $viewDirectory . DS . $str;
+            $output = APP_PATH . DS . $viewDirectory . DS . $str;
         }
 
         if (!file_exists($output)) {
             if (substr($str, 0, 1) == DS) {
-                $output = DRAGON_PATH . $str;
+                $output = CORE_PATH . $str;
             } else {
-                $output = DRAGON_PATH . DS . $viewDirectory . DS . $str;
+                $output = CORE_PATH . DS . $viewDirectory . DS . $str;
             }
 
             if (!file_exists($output)) {
