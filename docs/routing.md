@@ -55,4 +55,4 @@ To generate url (mask version based on route definition) you can call (ex.) `\Dr
 
 For homepage url you can use shortcut `\Dragon\Router::gi()->homepage();`. What is homepage is specified by [config](config.md).
 
-To redirect user somewhere else you can call `\Dragon\http\Response::redirect();`. It supports message which is passed as session flash message. In debug mode redirecting shows custom page with more information about call.
+To redirect user somewhere else you can call `\Dragon\http\Response::redirect();`. In debug mode redirecting shows custom page with more information about call.
