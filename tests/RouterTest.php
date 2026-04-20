@@ -203,19 +203,19 @@ namespace {
         public function testFindRouteSimple(): void
         {
             Config::gi()->set('routes', [
-                'about' => 'RouterTestHome/about',
+                'about' => 'controllers/RouterTestHome/about',
             ]);
 
             $result = Router::gi()->findRoute('about');
             $this->assertSame('about', $result['method']);
-            $this->assertSame(['controllers', 'RouterTestHome'], array_values($result['controller']));
+            $this->assertSame('\\controllers\\RouterTestHome', $result['controller']);
             $this->assertSame([], $result['vars']);
         }
 
         public function testFindRouteWithInt(): void
         {
             Config::gi()->set('routes', [
-                'user/%i' => 'RouterTestHome/show',
+                'user/%i' => 'controllers/RouterTestHome/show',
             ]);
 
             $result = Router::gi()->findRoute('user/42');
@@ -227,7 +227,7 @@ namespace {
         public function testFindRouteWithString(): void
         {
             Config::gi()->set('routes', [
-                'post/%s' => 'RouterTestHome/view',
+                'post/%s' => 'controllers/RouterTestHome/view',
             ]);
 
             $result = Router::gi()->findRoute('post/hello-world');
@@ -239,7 +239,7 @@ namespace {
         public function testFindRouteWithFloat(): void
         {
             Config::gi()->set('routes', [
-                'price/%d' => 'RouterTestHome/list',
+                'price/%d' => 'controllers/RouterTestHome/list',
             ]);
 
             $result = Router::gi()->findRoute('price/3.14');
@@ -251,7 +251,7 @@ namespace {
         public function testFindRouteWithMultipleVars(): void
         {
             Config::gi()->set('routes', [
-                'category/%s/item/%i' => 'RouterTestHome/show',
+                'category/%s/item/%i' => 'controllers/RouterTestHome/show',
             ]);
 
             $result = Router::gi()->findRoute('category/books/item/5');
@@ -262,7 +262,7 @@ namespace {
         public function testFindRouteNoMatch(): void
         {
             Config::gi()->set('routes', [
-                'home' => 'RouterTestHome/index',
+                'home' => 'controllers/RouterTestHome/index',
             ]);
 
             $result = Router::gi()->findRoute('no/such/path');
@@ -272,7 +272,7 @@ namespace {
         public function testFindRouteIsCaseInsensitive(): void
         {
             Config::gi()->set('routes', [
-                'About' => 'RouterTestHome/about',
+                'About' => 'controllers/RouterTestHome/about',
             ]);
 
             $result = Router::gi()->findRoute('about');
@@ -285,14 +285,15 @@ namespace {
             $result = Router::gi()->resolve();
 
             $this->assertSame('index', $result['method']);
-            $this->assertContains('controllers', $result['controller']);
+            $this->assertStringStartsWith('\\', $result['controller']);
+            $this->assertStringContainsString('controllers', $result['controller']);
             $this->assertSame([], $result['vars']);
         }
 
         public function testResolveWithMatchedRoute(): void
         {
             Config::gi()->set('routes', [
-                'about' => 'RouterTestHome/about',
+                'about' => 'controllers/RouterTestHome/about',
             ]);
 
             $_SERVER['REQUEST_URI'] = '/about';
@@ -303,7 +304,7 @@ namespace {
         public function testResolveWithRouteVars(): void
         {
             Config::gi()->set('routes', [
-                'user/%i' => 'RouterTestHome/show',
+                'user/%i' => 'controllers/RouterTestHome/show',
             ]);
 
             $_SERVER['REQUEST_URI'] = '/user/99';
@@ -322,7 +323,7 @@ namespace {
         public function testResolveStripsQueryString(): void
         {
             Config::gi()->set('routes', [
-                'about' => 'RouterTestHome/about',
+                'about' => 'controllers/RouterTestHome/about',
             ]);
 
             $_SERVER['REQUEST_URI'] = '/about?foo=bar';

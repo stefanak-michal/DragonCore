@@ -7,7 +7,7 @@ Routing works with specification in config with key "routes", usually specified 
 ## How does it works
 
 Router will take first match from routes table.  
-Namespace word `controllers` is automatically prefixed. 
+Route targets must contain the fully-qualified controller class name (with namespace) followed by the method, separated by slashes or backslashed (escaped as double backslashes). Namespace is treated as absolute even when initial slash is missing. No namespace is added automatically.
 
 Available placeholders are:
 - %i (int)
@@ -19,25 +19,28 @@ Available placeholders are:
 ```php
 $aConfig = [
     'routes' => [
-        // No mask, direct controller/method: <project_host>/homepage/index -> controllers/homepage->index()
-        'homepage/index',
-        // Mask to target: <project_host>/course/6-some-title -> controllers/Homepage->course(int $i, string $s)
-        'course/%i-%s' => 'Homepage/course',
-        // you can group routes by controller
-        'OtherController' => [
-             // <project_host>/do-something -> controllers/OtherController->someMethod()
-             'do-something' => 'someMethod'
-        ],
-        // nested controller
-        'admin/Dashboard' => [
-             // <project_host>/admin/dashboard -> controllers/admin/Dashboard->index()
-             'admin/dashboard' => 'index'
-        ],
+          // No mask, direct controller/method: <project_host>/controllers/Homepage/index -> controllers\Homepage->index()
+          'controllers/Homepage/index',
+          // Mask to target: <project_host>/course/6-some-title -> controllers\Homepage->course(int $i, string $s)
+          'course/%i-%s' => 'controllers/Homepage/course',
+          // you can group routes by controller (key is the namespace path, value is the method)
+          'controllers/OtherController' => [
+               // <project_host>/do-something -> controllers\OtherController->someMethod()
+               'do-something' => 'someMethod'
+          ],
+          // nested controller
+          'controllers/admin/Dashboard' => [
+               // <project_host>/adm/board -> controllers\admin\Dashboard->index()
+               'adm/board' => 'index'
+          ],
 
-        //You can also use this style, but that will cause php interpretor to load and execute the file
-        \controllers\admin\Dashboard::class => [
-             //some routes
-        ]
+          // double backslash can be used too
+          'new-url' => 'controllers\\Something\\index',
+
+          // Using ::class constant is also supported (causes the file to be loaded and executed by PHP)
+          \controllers\admin\Dashboard::class => [
+               // some routes
+          ]
     ]
 ];
 ```

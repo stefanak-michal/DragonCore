@@ -13,7 +13,7 @@ namespace Dragon;
 final class Application
 {
     /**
-     * Called controller
+     * Instance of called controller
      *
      * @static
      * @var \Dragon\controllers\IController
@@ -21,7 +21,7 @@ final class Application
     public static $controller;
 
     /**
-     * Called method
+     * Name of called method
      *
      * @static
      * @var string
@@ -39,7 +39,6 @@ final class Application
             header('X-Dragon-Debug: ' . Router::gi()->getHost() . 'tmp/debug/last.html');
         }
 
-        //finally we have something to show
         $this->loadController($cmv);
 
         $request = new \Dragon\http\Request($cmv['vars']);
@@ -77,20 +76,20 @@ final class Application
      */
     private function loadController(array $cmv)
     {
-        //if we have nothing to do, then quit
         if (empty($cmv) or empty($cmv['controller']) or empty($cmv['method'])) {
             throw new \RuntimeException('Route resolved to empty controller or method');
         }
 
-        self::$method = $cmv['method'];
-
-        $last = ucfirst(array_pop($cmv['controller']));
-        $className = "\\" . implode("\\", $cmv['controller']) . "\\" . $last;
-        if (!class_exists($className)) {
-            throw new \RuntimeException("Controller class $className not found");
+        if (!class_exists($cmv['controller'])) {
+            throw new \RuntimeException("Controller class {$cmv['controller']} not found");
         }
+        
+        self::$method = $cmv['method'];
+        self::$controller = new $cmv['controller']();
 
-        self::$controller = new $className();
+        if (!method_exists(self::$controller, $cmv['method'])) {
+            throw new \RuntimeException("Method {$cmv['method']} not found in controller {$cmv['controller']}");
+        }
     }
 
     /**

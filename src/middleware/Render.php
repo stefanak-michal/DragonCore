@@ -34,17 +34,16 @@ class Render implements IMiddleware
      */
     private function trySetView(): void
     {
-        $controller = array_filter(explode('/', str_replace('\\', '/', \Dragon\Application::$controller::class)));
-        array_shift($controller);
+        $controller = ltrim(str_replace('\\', '/', \Dragon\Application::$controller::class), '/');
 
         $possibleViewFile = [
-            implode('/', $controller) . '/' . \Dragon\Application::$method,
-            strtolower(implode('/', $controller)) . '/' . \Dragon\Application::$method,
-            strtolower(implode('/', $controller) . '/' . \Dragon\Application::$method),
+            $controller . '/' . \Dragon\Application::$method,
+            strtolower($controller) . '/' . \Dragon\Application::$method,
+            strtolower($controller . '/' . \Dragon\Application::$method),
         ];
 
         $snake_case = [];
-        foreach ($controller as $part) {
+        foreach (explode('/', $controller) as $part) {
             $snake_case[] = \Dragon\helpers\Utils::snake_case($part);
         }
         $possibleViewFile[] = implode('/', $snake_case) . '/' . \Dragon\Application::$method;

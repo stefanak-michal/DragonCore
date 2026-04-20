@@ -71,7 +71,7 @@ namespace {
             $_SERVER['REQUEST_URI'] = '/';
 
             Config::gi()->set('project_host', 'http://example.test');
-            Config::gi()->set('defaultController', 'AppTestHome');
+            Config::gi()->set('defaultController', 'controllers/AppTestHome');
             Config::gi()->set('defaultMethod', 'index');
             Config::gi()->set('routes', []);
         }

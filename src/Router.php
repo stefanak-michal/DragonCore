@@ -79,8 +79,6 @@ final class Router
         foreach (Config::gi()->get('routes', []) as $key => $value) {
             if (is_array($value)) {
                 $controller = str_replace('\\', '/', $key);
-                if (strpos($controller, 'controllers') !== 0)
-                    $controller = 'controllers/' . $controller;
 
                 foreach ($value as $mask => $route) {
                     if (!is_string($mask)) {
@@ -94,9 +92,6 @@ final class Router
                 }
 
                 $value = str_replace('\\', '/', $value);
-                if (strpos($value, 'controllers') !== 0) {
-                    $value = 'controllers/' . $value;
-                }
 
                 $this->routes[$key] = $value;
             }
@@ -120,22 +115,15 @@ final class Router
      * Reads default controller and method from Config.
      * Falls back to defaults when no route matches.
      *
-     * @return array{controller: array, method: string, vars: array}
+     * @return array
      */
     public function resolve(): array
     {
         $cmv = [
-            'controller' => Config::gi()->get('defaultController'),
+            'controller' => str_replace('/', '\\', Config::gi()->get('defaultController')),
             'method' => Config::gi()->get('defaultMethod'),
             'vars' => [],
         ];
-
-        if (is_string($cmv['controller'])) {
-            $cmv['controller'] = array_filter(explode('/', str_replace('\\', '/', $cmv['controller'])));
-            if (reset($cmv['controller']) !== 'controllers') {
-                array_unshift($cmv['controller'], 'controllers');
-            }
-        }
 
         $path = $this->extractPath();
 
@@ -147,6 +135,8 @@ final class Router
                 $cmv['vars'] = explode('/', $path);
             }
         }
+
+        $cmv['controller'] = '\\' . ltrim($cmv['controller'], '\\');
 
         return $cmv;
     }
@@ -346,7 +336,7 @@ final class Router
      * @param string $route
      * @return array
      */
-    private function match(string $path, $mask, string $route): array
+    private function match(string $path, string|int $mask, string $route): array
     {
         $output = [];
 
@@ -365,7 +355,8 @@ final class Router
         $pattern .= '$/i';
 
         if (preg_match($pattern, $path, $vars)) {
-            $uri = array_filter(explode('/', $route));
+            $parts = array_filter(explode('/', str_replace('\\', '/', $route)));
+            $method = array_pop($parts);
             array_shift($vars);
             $vars = array_values($vars);
 
@@ -378,8 +369,8 @@ final class Router
             }
 
             $output = [
-                'method' => array_pop($uri),
-                'controller' => $uri,
+                'method' => $method,
+                'controller' => '\\' . implode('\\', $parts),
                 'vars' => $vars,
             ];
         }

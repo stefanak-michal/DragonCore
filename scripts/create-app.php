@@ -87,7 +87,7 @@ file_put_contents(BASE_PATH . DS . 'index.php', $index);
 //config files
 file_put_contents(BASE_PATH . DS . 'config' . DS . 'main.cfg.php', '<?php
 $aConfig = [
-    \'defaultController\' => \'Homepage\',
+    \'defaultController\' => \'controllers/Homepage\',
     \'defaultMethod\' => \'index\',
 ];
 ');
@@ -115,7 +115,7 @@ $config = <<<'EOD'
  */
 $aConfig = [
     'routes' => [
-        '/' => 'homepage/index',
+        '/' => 'controllers/Homepage/index',
     ]
 ];
 
