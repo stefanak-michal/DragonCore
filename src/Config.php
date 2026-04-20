@@ -68,7 +68,7 @@ final class Config
                     }
                 }
             }
-    
+
             if (file_exists(APP_PATH . DS . 'config' . DS)) {
                 $dir = new \RecursiveDirectoryIterator(APP_PATH . DS . 'config' . DS);
                 $iterator = new \RecursiveIteratorIterator($dir);

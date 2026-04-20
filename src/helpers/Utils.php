@@ -39,7 +39,7 @@ class Utils
                         }
                     }
                     foreach ($m_open as $k => $tag) {
-                        if (isset($c_tags[$tag]) AND $c_tags[$tag]-- <= 0) {
+                        if (isset($c_tags[$tag]) and $c_tags[$tag]-- <= 0) {
                             $text .= '</' . $tag . '>';
                         }
                     }

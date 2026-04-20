@@ -270,7 +270,7 @@ final class Debug
                 'URI' => $match[1],
                 'date' => \DateTime::createFromFormat('U.u', $time[1])->format('Y-m-d H:i:s.u'),
                 '' =>
-                    '<a href="' . Router::gi()->getHost() . 'tmp/debug/' . $time[1] . '.html" target="_blank">view</a>',
+                '<a href="' . Router::gi()->getHost() . 'tmp/debug/' . $time[1] . '.html" target="_blank">view</a>',
             ];
         }
     }

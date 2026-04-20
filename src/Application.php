@@ -83,7 +83,7 @@ final class Application
         if (!class_exists($cmv['controller'])) {
             throw new \RuntimeException("Controller class {$cmv['controller']} not found");
         }
-        
+
         self::$method = $cmv['method'];
         self::$controller = new $cmv['controller']();
 

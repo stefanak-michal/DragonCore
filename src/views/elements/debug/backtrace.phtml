@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @var array $bt
  * @var string $url
@@ -12,22 +13,24 @@
 <br><br>
 
 <table>
-<? foreach ( $bt AS $row ): ?>
-    <tr>
-        <td><?= isset($row['class'], $row['type']) ? ('<b>' . $row['class'] . $row['type'] . '</b>') : '' ?><?= $row['function'] ?></td>
-        <td><?= isset($row['line']) ? 'r. ' . $row['line'] : '' ?></td>
-    </tr>
-    <tr>
-        <td colspan="2" style="border-bottom: 1px solid gray; ">
-            <? if ( !empty($row['args']) ) {
-                $row['args'] = \Dragon\helpers\ArrayUtils::arrayMapRecursive(function($item) { return is_object($item) ? false : $item; }, $row['args']);
-                if ( !empty($row['args']) ) {
-                    echo 'args: ';
-                    print_r($row['args']);
-                }
-            } ?>
-    </tr>
-<? endforeach; ?>
+    <? foreach ($bt as $row): ?>
+        <tr>
+            <td><?= isset($row['class'], $row['type']) ? ('<b>' . $row['class'] . $row['type'] . '</b>') : '' ?><?= $row['function'] ?></td>
+            <td><?= isset($row['line']) ? 'r. ' . $row['line'] : '' ?></td>
+        </tr>
+        <tr>
+            <td colspan="2" style="border-bottom: 1px solid gray; ">
+                <? if (!empty($row['args'])) {
+                    $row['args'] = \Dragon\helpers\ArrayUtils::arrayMapRecursive(function ($item) {
+                        return is_object($item) ? false : $item;
+                    }, $row['args']);
+                    if (!empty($row['args'])) {
+                        echo 'args: ';
+                        print_r($row['args']);
+                    }
+                } ?>
+        </tr>
+    <? endforeach; ?>
 </table>
 
 <br>

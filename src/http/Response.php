@@ -114,12 +114,11 @@ class Response
         if (DRAGON_DEBUG) {
             header('Content-Type: text/html');
             echo
-                new \Dragon\View('/views/elements/debug/backtrace', [
-                    'bt' => debug_backtrace(),
-                    'url' => $uri,
-                    'code' => $code,
-                ])->render()
-            ;
+            new \Dragon\View('/views/elements/debug/backtrace', [
+                'bt' => debug_backtrace(),
+                'url' => $uri,
+                'code' => $code,
+            ])->render();
             exit();
         }
 

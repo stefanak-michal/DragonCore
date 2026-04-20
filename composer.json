@@ -1,7 +1,11 @@
 {
     "name": "stefanak-michal/dragoncore",
     "description": "PHP framework. Simple, fast and lightweight.",
-    "keywords": ["php", "mvc", "framework", "dragoncore"],
+    "keywords": [
+        "php",
+        "framework",
+        "dragoncore"
+    ],
     "homepage": "https://github.com/stefanak-michal/DragonCore",
     "type": "project",
     "readme": "README.md",
@@ -11,6 +15,9 @@
         "php": "^8.5",
         "ext-curl": "*",
         "phpmailer/phpmailer": "^6"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^13"
     },
     "support": {
         "issues": "https://github.com/stefanak-michal/DragonCore/issues",
@@ -33,8 +40,5 @@
         "psr-4": {
             "Dragon\\": "src/"
         }
-    },
-    "require-dev": {
-        "phpunit/phpunit": "13"
     }
 }

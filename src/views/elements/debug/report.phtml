@@ -1,125 +1,126 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 
-    <style>
-      ul {
-        margin: 0;
-        padding: 0 0 10px;
-      }
+  <style>
+    ul {
+      margin: 0;
+      padding: 0 0 10px;
+    }
 
-      ul li {
-        display: inline-block;
-        border-bottom: 1px solid silver;
-        padding: 4px 10px;
-        cursor: pointer;
-        margin: 0 -2px;
-      }
+    ul li {
+      display: inline-block;
+      border-bottom: 1px solid silver;
+      padding: 4px 10px;
+      cursor: pointer;
+      margin: 0 -2px;
+    }
 
-      ul li:hover {
-        background-color: #eee;
-      }
+    ul li:hover {
+      background-color: #eee;
+    }
 
-      ul li.active {
-        border: 1px solid silver;
-        border-bottom: 0;
-      }
+    ul li.active {
+      border: 1px solid silver;
+      border-bottom: 0;
+    }
 
-      table {
-        display: none;
-        width: 100%;
-      }
+    table {
+      display: none;
+      width: 100%;
+    }
 
-      table.active {
-        display: table;
-      }
+    table.active {
+      display: table;
+    }
 
-      table tr > * {
-        border-bottom: 1px solid silver;
-        border-left: 1px solid silver;
-      }
+    table tr>* {
+      border-bottom: 1px solid silver;
+      border-left: 1px solid silver;
+    }
 
-      table tr *:first-child {
-        border-left: 0;
-      }
+    table tr *:first-child {
+      border-left: 0;
+    }
 
-      table tr td {
-        border-bottom: 1px solid silver;
-        padding: 4px 6px;
-      }
+    table tr td {
+      border-bottom: 1px solid silver;
+      padding: 4px 6px;
+    }
 
-      table tr td table {
-        display: table;
-      }
+    table tr td table {
+      display: table;
+    }
 
-      table th {
-        border-bottom: 2px solid black;
-      }
+    table th {
+      border-bottom: 2px solid black;
+    }
 
-      table tbody tr:nth-child(even) {
-        background-color: #eee;
-      }
+    table tbody tr:nth-child(even) {
+      background-color: #eee;
+    }
 
-      table tbody tr:nth-child(odd) {
-        background-color: white;
-      }
+    table tbody tr:nth-child(odd) {
+      background-color: white;
+    }
 
-      table tfoot tr td {
-        border: 0;
-        margin-top: 4px;
-        color: gray;
-      }
+    table tfoot tr td {
+      border: 0;
+      margin-top: 4px;
+      color: gray;
+    }
 
-      .history {
-        margin-top: 50px;
-      }
+    .history {
+      margin-top: 50px;
+    }
 
-      .history a {
-        display: block;
-      }
+    .history a {
+      display: block;
+    }
 
-      details summary {
-        cursor: pointer;
-      }
+    details summary {
+      cursor: pointer;
+    }
 
-      details > *:not(summary) {
-        padding-left: 10px;
-        margin-top: 10px;
-      }
+    details>*:not(summary) {
+      padding-left: 10px;
+      margin-top: 10px;
+    }
 
-      .red {
-        color: red;
-      }
-    </style>
+    .red {
+      color: red;
+    }
+  </style>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            for (const li of document.querySelectorAll("ul li")) {
-                li.addEventListener("click", function () {
-                    document.querySelectorAll("ul li, table").forEach(el => el.classList.remove("active"));
-                    this.classList.add("active");
-                    document.getElementById(this.dataset.tab).classList.add("active");
-                });
-            }
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      for (const li of document.querySelectorAll("ul li")) {
+        li.addEventListener("click", function() {
+          document.querySelectorAll("ul li, table").forEach(el => el.classList.remove("active"));
+          this.classList.add("active");
+          document.getElementById(this.dataset.tab).classList.add("active");
         });
-    </script>
+      }
+    });
+  </script>
 </head>
 
 <body>
 
-URI: <b><?= $uri ?></b><br>
-CM: <b><?= $cm ?></b><br>
-Time: <b><?= $time ?></b><br>
-Last: <a href="<?= $last ?>"><?= $last ?></a><br>
-<br>
-<ul>
+  URI: <b><?= $uri ?></b><br>
+  CM: <b><?= $cm ?></b><br>
+  Time: <b><?= $time ?></b><br>
+  Last: <a href="<?= $last ?>"><?= $last ?></a><br>
+  <br>
+  <ul>
     <? foreach ($tabs as $key): ?>
-        <li class="<?= $key == reset($tabs) ? 'active' : '' ?>" data-tab="<?= $key ?>"><?= $key ?> (<?= $counts[$key] ?? 0 ?>)</li>
+      <li class="<?= $key == reset($tabs) ? 'active' : '' ?>" data-tab="<?= $key ?>"><?= $key ?> (<?= $counts[$key] ?? 0 ?>)</li>
     <? endforeach; ?>
-</ul>
+  </ul>
 
-<?= $tables ?>
+  <?= $tables ?>
 
 </body>
 
