@@ -6,24 +6,25 @@
  *
  * @author Michal Stefanak
  * @package scripts
- * @link https://github.com/stefanak-michal/DragonMVC
+ * @link https://github.com/stefanak-michal/DragonCore
  */
 
 if ($argc != 2) {
     echo 'You have to enter target path for your app as argument';
-    exit;
+    exit();
 }
 
 if (file_exists($argv[1])) {
     if (!is_dir($argv[1]) || count(scandir($argv[1])) > 2) {
         echo 'Target path has to be empty directory';
-        exit;
+        exit();
     }
 }
 
 //realpath works only on existing path
-if (!file_exists($argv[1]))
+if (!file_exists($argv[1])) {
     mkdir($argv[1], 0777, true);
+}
 define('BASE_PATH', realpath($argv[1]));
 
 require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'init.php';
@@ -39,6 +40,7 @@ $dirs = [
     'config' . DS . 'development',
     'controllers',
     'helpers',
+    'middleware',
     'models',
     'scripts',
     'vendor',
@@ -49,7 +51,7 @@ $dirs = [
 foreach ($dirs as $dir) {
     if (!mkdir(BASE_PATH . DS . $dir)) {
         echo 'Cannot create directory at ' . BASE_PATH . DS . $dir;
-        exit;
+        exit();
     }
 }
 
@@ -59,9 +61,9 @@ $index = <<<'EOD'
 
 $path = '';
 $paths = [
-    getenv('DRAGON_PATH'),
-    __DIR__ . DIRECTORY_SEPARATOR . 'dragonmvc',
-    dirname(__DIR__) . DIRECTORY_SEPARATOR . 'dragonmvc'
+    getenv('DRAGONCORE_PATH'),
+    __DIR__ . DIRECTORY_SEPARATOR . 'dragoncore',
+    dirname(__DIR__) . DIRECTORY_SEPARATOR . 'dragoncore'
 ];
 foreach ($paths as $entry) {
     $entry = rtrim($entry, '/\\');
@@ -71,13 +73,13 @@ foreach ($paths as $entry) {
     }
 }
 
-if (empty($path))
-    exit('DragonMVC core not found. Define global system variable DRAGON_PATH with path to it.');
+if (empty($path)) {
+    exit('DragonCore not found. Define global system variable DRAGONCORE_PATH with path to it.');
+}
 
-define('DRAGON_PATH', $path);
-define('BASE_PATH', __DIR__);
+define('APP_PATH', __DIR__);
 
-include_once DRAGON_PATH . DIRECTORY_SEPARATOR . 'init.php';
+include_once $path . DIRECTORY_SEPARATOR . 'init.php';
 
 EOD;
 file_put_contents(BASE_PATH . DS . 'index.php', $index);
@@ -85,7 +87,7 @@ file_put_contents(BASE_PATH . DS . 'index.php', $index);
 //config files
 file_put_contents(BASE_PATH . DS . 'config' . DS . 'main.cfg.php', '<?php
 $aConfig = [
-    \'defaultController\' => \'Homepage\',
+    \'defaultController\' => \'controllers/Homepage\',
     \'defaultMethod\' => \'index\',
 ];
 ');
@@ -109,22 +111,25 @@ $config = <<<'EOD'
  * %d - double (with dot separator)
  * %s - any string (default regex [\w\-]+)
  *
- * @link https://github.com/stefanak-michal/DragonMVC/wiki/Routing
+ * @see docs/routing.md for more details
  */
 $aConfig = [
     'routes' => [
-        '/' => 'homepage/index',
+        '/' => 'controllers/Homepage/index',
     ]
 ];
 
 EOD;
 file_put_contents(BASE_PATH . DS . 'config' . DS . 'routes.cfg.php', $config);
 
-
 //controller
 file_put_contents(BASE_PATH . DS . 'controllers' . DS . 'Homepage.php', '<?php
 
 namespace controllers;
+
+use Dragon\controllers\IController;
+use Dragon\http\Request;
+use Dragon\http\Response;
 
 /**
  * Class Homepage
@@ -133,23 +138,17 @@ namespace controllers;
 class Homepage implements IController
 {
 
-    public function index()
+    public function index(Request $request, Response $response): Response
     {
-        \core\View::gi()->set("msg", "Hello ' . basename(BASE_PATH) . '!");
+        \Dragon\View::gi()->set("msg", "Hello ' . basename(BASE_PATH) . '!");
+        return $response;
     }
-    
-    public function beforeMethod()
+
+    public function middleware(): array
     {
- 
-    }
-    
-    public function afterMethod()
-    {
-        $content = \Core\View::gi()->render();
-        $pos = strrpos($content, "</body>");
-        if (IS_WORKSPACE && $pos !== false)
-            $content = substr_replace($content, \core\Debug::onsite(), $pos, 0);
-        echo $content;
+        return [
+            new \Dragon\middleware\Render(),
+        ];
     }
 }
 ');
@@ -171,6 +170,7 @@ file_put_contents(BASE_PATH . DS . 'views' . DS . 'homepage' . DS . 'index.phtml
 file_put_contents(BASE_PATH . DS . '.gitignore', '/tmp/
 .htaccess
 .idea
+.vscode
 /config/development/
 ');
 

@@ -3,34 +3,47 @@
  * Project initialization script
  *
  * @author Michal Stefanak
- * @link https://github.com/stefanak-michal/DragonMVC
+ * @link https://github.com/stefanak-michal/DragonCore
  */
 
-if (!defined('DS'))
+if (!defined('DS')) {
     define('DS', DIRECTORY_SEPARATOR);
+}
 
-if (!defined('BASE_PATH')) {
-    if (array_key_exists('SCRIPT_FILENAME', $_SERVER)) {
-        define('BASE_PATH', pathinfo($_SERVER['SCRIPT_FILENAME'], PATHINFO_DIRNAME));
-    } else {
-        define('BASE_PATH', __DIR__);
+if (!defined('APP_PATH')) {
+    define('APP_PATH', dirname(get_included_files()[0]));
+}
+
+if (!defined('CORE_PATH')) {
+    define('CORE_PATH', __DIR__ . DS . 'src');
+}
+
+if (file_exists(APP_PATH . DS . 'vendor' . DS . 'autoload.php')) {
+    require_once APP_PATH . DS . 'vendor' . DS . 'autoload.php';
+}
+if (file_exists(__DIR__ . DS . 'vendor' . DS . 'autoload.php')) {
+    require_once __DIR__ . DS . 'vendor' . DS . 'autoload.php';
+}
+
+// Register autoloader for app classes
+spl_autoload_register(function (string $class) {
+    if (empty($class)) {
+        return;
     }
-}
-
-if (!defined('DRAGON_PATH')) {
-    define('DRAGON_PATH', __DIR__);
-}
-
-require_once __DIR__ . DS . 'autoload.php';
-if (file_exists(BASE_PATH . DS . 'vendor' . DS . 'autoload.php'))
-    require_once BASE_PATH . DS . 'vendor' . DS . 'autoload.php';
-if (file_exists(DRAGON_PATH . DS . 'vendor' . DS . 'autoload.php'))
-    require_once DRAGON_PATH . DS . 'vendor' . DS . 'autoload.php';
+    $file = APP_PATH . DS . str_replace(['\\', '/'], DS, $class) . '.php';
+    if (is_readable($file)) {
+        require_once $file;
+    }
+});
 
 if (!defined('IS_WORKSPACE')) {
     $workspace = false;
-    if (file_exists(BASE_PATH . DS . 'config' . DS . 'development' . DS) || in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1']))
+    if (
+        file_exists(APP_PATH . DS . 'config' . DS . 'development' . DS)
+        || in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'])
+    ) {
         $workspace = true;
+    }
     define('IS_WORKSPACE', $workspace);
 }
 
@@ -42,8 +55,8 @@ if (IS_CLI) {
 }
 
 if (!defined('DRAGON_DEBUG')) {
-    if (\core\Config::gi()->get('debug') !== null) {
-        $debug = \core\Config::gi()->get('debug') == 1;
+    if (\Dragon\Config::gi()->get('debug') !== null) {
+        $debug = !empty(\Dragon\Config::gi()->get('debug'));
     } else {
         $debug = IS_WORKSPACE;
     }
@@ -51,18 +64,18 @@ if (!defined('DRAGON_DEBUG')) {
 }
 
 /**
- * Dragon debug - simple alias for \dragon\Debug::var_dump
+ * Dragon debug - simple alias for \Dragon\Debug::var_dump()
  * @param mixed ...$vars
  */
 function dump(...$vars)
 {
-    \core\Debug::var_dump(...$vars);
+    \Dragon\Debug::var_dump(...$vars);
 }
 
 $autorun = $autorun ?? true;
 
 //Execute project
-$app = new \core\Dragon();
-if ( !IS_CLI && $autorun ) {
+$app = new \Dragon\Application();
+if (!IS_CLI && $autorun) {
     $app->run();
 }

@@ -1,0 +1,33 @@
+name: PHPUnit Tests
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches: [ master ]
+
+jobs:
+  phpunit-2204:
+    if: ${{ github.event.pull_request.draft == false }}
+    runs-on: ubuntu-22.04
+    name: "Running Tests for PHP ${{ matrix.php-version }}"
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: ['8.5']
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          coverage: xdebug
+          ini-values: max_execution_time=0
+
+      - name: Install dependencies
+        run: composer install --no-progress
+
+      - name: Test with phpunit
+        run: vendor/bin/phpunit --configuration phpunit.xml --testsuite "DragonCore"
