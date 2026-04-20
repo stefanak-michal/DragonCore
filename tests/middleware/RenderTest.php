@@ -88,15 +88,13 @@ namespace {
             parent::tearDown();
         }
 
-        private function removeDirectory($path)
+        private function removeDirectory(string $dir): void
         {
-            $files = glob($path . '/*');
+            $files = array_diff(scandir($dir), array('.', '..'));
             foreach ($files as $file) {
-                is_dir($file) ? $this->removeDirectory($file) : unlink($file);
+                (is_dir("$dir/$file")) ? $this->removeDirectory("$dir/$file") : unlink("$dir/$file");
             }
-            if (file_exists($path)) {
-                rmdir($path);
-            }
+            rmdir($dir);
         }
 
         /**
