@@ -25,6 +25,17 @@ if (file_exists(__DIR__ . DS . 'vendor' . DS . 'autoload.php')) {
     require_once __DIR__ . DS . 'vendor' . DS . 'autoload.php';
 }
 
+// Register autoloader for app classes
+spl_autoload_register(function (string $class) {
+    if (empty($class)) {
+        return;
+    }
+    $file = APP_PATH . DS . str_replace(['\\', '/'], DS, $class) . '.php';
+    if (is_readable($file)) {
+        require_once $file;
+    }
+});
+
 if (!defined('IS_WORKSPACE')) {
     $workspace = false;
     if (

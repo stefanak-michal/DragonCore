@@ -15,5 +15,9 @@ If you need to just load the framework without executing controllers logic, writ
 - [Config](config.md)
 - [Debug](debug.md)
 
+## Architecture
+
+This framework can be used in any architecture (MVC, DDD, etc.), thanks to the support for absolute paths for Controllers (native) and Views (optional).
+
 ### Framework requires:
 - short_open_tag = On

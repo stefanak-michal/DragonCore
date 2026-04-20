@@ -34,6 +34,9 @@ class CreateAppTest extends TestCase
 
     private function removeDirectory(string $dir): void
     {
+        if (!file_exists($dir)) {
+            return;
+        }
         $files = array_diff(scandir($dir), array('.', '..'));
         foreach ($files as $file) {
             (is_dir("$dir/$file")) ? $this->removeDirectory("$dir/$file") : unlink("$dir/$file");
