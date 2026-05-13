@@ -10,6 +10,12 @@
 * CLI support
 * PHP >= 8.5
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/stefanak-michal/DragonCore)
+[![](https://img.shields.io/packagist/dt/stefanak-michal/dragoncore)](https://packagist.org/packages/stefanak-michal/dragoncore/stats)
+[![](https://img.shields.io/github/v/release/stefanak-michal/DragonCore)](https://github.com/stefanak-michal/DragonCore/releases)
+[![](https://img.shields.io/github/commits-since/stefanak-michal/DragonCore/latest)](https://github.com/stefanak-michal/DragonCore/releases/latest)
+[![](https://img.shields.io/github/stars/stefanak-michal/DragonCore)](https://github.com/stefanak-michal/DragonCore/stargazers)
+
 ## How to start
 
 1. Use composer to create project with framework `composer create-project stefanak-michal/dragoncore`.
