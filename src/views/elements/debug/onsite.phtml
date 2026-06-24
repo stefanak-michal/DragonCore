@@ -95,9 +95,9 @@
   <div id="dragon-debug-menu">
     <span id="dragon-debug-close" title="Close toolbar">X</span>
     <b><?= $cm ?></b>
-    <? foreach ($tabs as $key): ?>
+    <?php foreach ($tabs as $key): ?>
       <span onclick=" dragonDebug.showTable('<?= $key ?>'); "><?= $key ?> (<?= $counts[$key] ?>)</span>
-    <? endforeach; ?>
+    <?php endforeach; ?>
   </div>
   <?= $tables ?>
 </div>

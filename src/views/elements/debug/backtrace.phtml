@@ -13,14 +13,14 @@
 <br><br>
 
 <table>
-    <? foreach ($bt as $row): ?>
+    <?php foreach ($bt as $row): ?>
         <tr>
             <td><?= isset($row['class'], $row['type']) ? ('<b>' . $row['class'] . $row['type'] . '</b>') : '' ?><?= $row['function'] ?></td>
             <td><?= isset($row['line']) ? 'r. ' . $row['line'] : '' ?></td>
         </tr>
         <tr>
             <td colspan="2" style="border-bottom: 1px solid gray; ">
-                <? if (!empty($row['args'])) {
+                <?php if (!empty($row['args'])) {
                     $row['args'] = \Dragon\helpers\ArrayUtils::arrayMapRecursive(function ($item) {
                         return is_object($item) ? false : $item;
                     }, $row['args']);
@@ -30,7 +30,7 @@
                     }
                 } ?>
         </tr>
-    <? endforeach; ?>
+    <?php endforeach; ?>
 </table>
 
 <br>

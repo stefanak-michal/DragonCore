@@ -15,4 +15,4 @@ This is identified by ip localhost or 127.0.0.1, or if directory `<app>/config/d
 
 ## Customization
 
-You can define (overwrite) any of these by yourself before including `init.php` file.
+You can define (overwrite) any of these by yourself before calling constructor of `\Dragon\Application` class.
