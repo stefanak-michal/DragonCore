@@ -19,23 +19,18 @@ Available placeholders are:
 ```php
 $aConfig = [
     'routes' => [
-          // No mask, direct controller/method: <project_host>/controllers/Homepage/index -> controllers\Homepage->index()
-          'controllers/Homepage/index',
+          '/' => 'controllers/Homepage/index',
+
           // Mask to target: <project_host>/course/6-some-title -> controllers\Homepage->course(int $i, string $s)
-          'course/%i-%s' => 'controllers/Homepage/course',
+          '/course/%i-%s' => 'controllers/Homepage/course',
           // you can group routes by controller (key is the namespace path, value is the method)
           'controllers/OtherController' => [
                // <project_host>/do-something -> controllers\OtherController->someMethod()
-               'do-something' => 'someMethod'
-          ],
-          // nested controller
-          'controllers/admin/Dashboard' => [
-               // <project_host>/adm/board -> controllers\admin\Dashboard->index()
-               'adm/board' => 'index'
+               '/do-something' => 'someMethod'
           ],
 
           // double backslash can be used too
-          'new-url' => 'controllers\\Something\\index',
+          '/new-url' => 'controllers\\Something\\index',
 
           // Using ::class constant is also supported (causes the file to be loaded and executed by PHP)
           \controllers\admin\Dashboard::class => [
