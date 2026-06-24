@@ -106,7 +106,7 @@ final class Router
         return[
             'controller' => '\\' . ltrim(str_replace('/', '\\', Config::gi()->get('defaultController')), '\\'),
             'method' => Config::gi()->get('defaultMethod'),
-            'vars' => [$path],
+            'vars' => [],
         ];
     }
 

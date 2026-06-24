@@ -84,7 +84,7 @@ namespace {
 
         public function testGetHost(): void
         {
-            $this->assertSame('http://example.test', Router::gi()->getHost());
+            $this->assertSame('http://example.test/', Router::gi()->getHost());
         }
 
         public function testSetSecureHostToTrue(): void
