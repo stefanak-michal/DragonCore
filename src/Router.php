@@ -95,12 +95,6 @@ final class Router
      */
     public function resolve(): array
     {
-        $cmv = [
-            'controller' => '',
-            'method' => '',
-            'vars' => [],
-        ];
-
         $path = str_replace(['//', '../'], '/', parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
         if (!empty($path)) {
             $found = $this->findRoute($path);
@@ -112,7 +106,7 @@ final class Router
         return[
             'controller' => '\\' . ltrim(str_replace('/', '\\', Config::gi()->get('defaultController')), '\\'),
             'method' => Config::gi()->get('defaultMethod'),
-            'vars' => [],
+            'vars' => [$path],
         ];
     }
 
@@ -123,7 +117,7 @@ final class Router
      */
     public function getHost(): string
     {
-        return $this->project_host;
+        return rtrim($this->project_host, '/') . '/';
     }
 
     /**
