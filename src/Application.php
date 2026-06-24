@@ -39,7 +39,7 @@ final class Application
         }
 
         if (!defined('CORE_PATH')) {
-            define('CORE_PATH', __DIR__ . DS . 'src');
+            define('CORE_PATH', __DIR__);
         }
 
         if (!defined('IS_WORKSPACE')) {
