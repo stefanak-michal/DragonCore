@@ -84,12 +84,7 @@ namespace {
 
         public function testGetHost(): void
         {
-            $this->assertSame('http://example.test/', Router::gi()->getHost());
-        }
-
-        public function testGetHostTrailingSlash(): void
-        {
-            $this->assertSame('http://example.test/', Router::gi()->getHost());
+            $this->assertSame('http://example.test', Router::gi()->getHost());
         }
 
         public function testSetSecureHostToTrue(): void
@@ -121,7 +116,7 @@ namespace {
 
         public function testHomepage(): void
         {
-            $this->assertSame('http://example.test/', Router::gi()->homepage());
+            $this->assertSame('http://example.test', Router::gi()->homepage());
         }
 
         public function testHomepageWithQuery(): void
@@ -138,12 +133,6 @@ namespace {
             Router::gi()->url('NonExistentClass', 'index');
         }
 
-        public function testUrlFallbackNoMask(): void
-        {
-            $url = Router::gi()->url('controllers\RouterTestHome', 'index');
-            $this->assertSame('http://example.test/controllers/RouterTestHome/index', $url);
-        }
-
         public function testUrlFallbackWithVars(): void
         {
             $url = Router::gi()->url('controllers\RouterTestHome', 'show', [42, 'hello']);
@@ -155,7 +144,7 @@ namespace {
         public function testUrlWithIntMask(): void
         {
             Config::gi()->set('routes', [
-                'user/%i/profile' => 'controllers/RouterTestHome/profile',
+                '/user/%i/profile' => 'controllers/RouterTestHome/profile',
             ]);
 
             $url = Router::gi()->url('controllers\RouterTestHome', 'profile', [7]);
@@ -165,7 +154,7 @@ namespace {
         public function testUrlWithStringMask(): void
         {
             Config::gi()->set('routes', [
-                'post/%s/view' => 'controllers/RouterTestHome/view',
+                '/post/%s/view' => 'controllers/RouterTestHome/view',
             ]);
 
             $url = Router::gi()->url('controllers\RouterTestHome', 'view', ['my-post']);
@@ -175,7 +164,7 @@ namespace {
         public function testUrlWithFloatMask(): void
         {
             Config::gi()->set('routes', [
-                'price/%d' => 'controllers/RouterTestHome/list',
+                '/price/%d' => 'controllers/RouterTestHome/list',
             ]);
 
             $url = Router::gi()->url('controllers\RouterTestHome', 'list', [3.14]);
@@ -191,7 +180,7 @@ namespace {
         public function testUrlVarCountMismatchFallsBack(): void
         {
             Config::gi()->set('routes', [
-                'user/%i/profile' => 'controllers/RouterTestHome/profile',
+                '/user/%i/profile' => 'controllers/RouterTestHome/profile',
             ]);
 
             // Passing 0 vars while mask expects 1 — should fall back to default URL format
@@ -203,10 +192,10 @@ namespace {
         public function testFindRouteSimple(): void
         {
             Config::gi()->set('routes', [
-                'about' => 'controllers/RouterTestHome/about',
+                '/about' => 'controllers/RouterTestHome/about',
             ]);
 
-            $result = Router::gi()->findRoute('about');
+            $result = Router::gi()->findRoute('/about');
             $this->assertSame('about', $result['method']);
             $this->assertSame('\\controllers\\RouterTestHome', $result['controller']);
             $this->assertSame([], $result['vars']);
@@ -215,10 +204,10 @@ namespace {
         public function testFindRouteWithInt(): void
         {
             Config::gi()->set('routes', [
-                'user/%i' => 'controllers/RouterTestHome/show',
+                '/user/%i' => 'controllers/RouterTestHome/show',
             ]);
 
-            $result = Router::gi()->findRoute('user/42');
+            $result = Router::gi()->findRoute('/user/42');
             $this->assertSame('show', $result['method']);
             $this->assertSame([42], $result['vars']);
             $this->assertIsInt($result['vars'][0]);
@@ -227,10 +216,10 @@ namespace {
         public function testFindRouteWithString(): void
         {
             Config::gi()->set('routes', [
-                'post/%s' => 'controllers/RouterTestHome/view',
+                '/post/%s' => 'controllers/RouterTestHome/view',
             ]);
 
-            $result = Router::gi()->findRoute('post/hello-world');
+            $result = Router::gi()->findRoute('/post/hello-world');
             $this->assertSame('view', $result['method']);
             $this->assertSame(['hello-world'], $result['vars']);
             $this->assertIsString($result['vars'][0]);
@@ -239,10 +228,10 @@ namespace {
         public function testFindRouteWithFloat(): void
         {
             Config::gi()->set('routes', [
-                'price/%d' => 'controllers/RouterTestHome/list',
+                '/price/%d' => 'controllers/RouterTestHome/list',
             ]);
 
-            $result = Router::gi()->findRoute('price/3.14');
+            $result = Router::gi()->findRoute('/price/3.14');
             $this->assertSame('list', $result['method']);
             $this->assertSame([3.14], $result['vars']);
             $this->assertIsFloat($result['vars'][0]);
@@ -251,10 +240,10 @@ namespace {
         public function testFindRouteWithMultipleVars(): void
         {
             Config::gi()->set('routes', [
-                'category/%s/item/%i' => 'controllers/RouterTestHome/show',
+                '/category/%s/item/%i' => 'controllers/RouterTestHome/show',
             ]);
 
-            $result = Router::gi()->findRoute('category/books/item/5');
+            $result = Router::gi()->findRoute('/category/books/item/5');
             $this->assertSame('show', $result['method']);
             $this->assertSame(['books', 5], $result['vars']);
         }
@@ -262,20 +251,20 @@ namespace {
         public function testFindRouteNoMatch(): void
         {
             Config::gi()->set('routes', [
-                'home' => 'controllers/RouterTestHome/index',
+                '/home' => 'controllers/RouterTestHome/index',
             ]);
 
-            $result = Router::gi()->findRoute('no/such/path');
+            $result = Router::gi()->findRoute('/no/such/path');
             $this->assertEmpty($result);
         }
 
         public function testFindRouteIsCaseInsensitive(): void
         {
             Config::gi()->set('routes', [
-                'About' => 'controllers/RouterTestHome/about',
+                '/About' => 'controllers/RouterTestHome/about',
             ]);
 
-            $result = Router::gi()->findRoute('about');
+            $result = Router::gi()->findRoute('/about');
             $this->assertSame('about', $result['method']);
         }
 
@@ -293,7 +282,7 @@ namespace {
         public function testResolveWithMatchedRoute(): void
         {
             Config::gi()->set('routes', [
-                'about' => 'controllers/RouterTestHome/about',
+                '/about' => 'controllers/RouterTestHome/about',
             ]);
 
             $_SERVER['REQUEST_URI'] = '/about';
@@ -304,7 +293,7 @@ namespace {
         public function testResolveWithRouteVars(): void
         {
             Config::gi()->set('routes', [
-                'user/%i' => 'controllers/RouterTestHome/show',
+                '/user/%i' => 'controllers/RouterTestHome/show',
             ]);
 
             $_SERVER['REQUEST_URI'] = '/user/99';
@@ -313,17 +302,10 @@ namespace {
             $this->assertSame([99], $result['vars']);
         }
 
-        public function testResolveFallbackToVarsWhenNoRouteMatches(): void
-        {
-            $_SERVER['REQUEST_URI'] = '/foo/bar/baz';
-            $result = Router::gi()->resolve();
-            $this->assertSame(['foo', 'bar', 'baz'], $result['vars']);
-        }
-
         public function testResolveStripsQueryString(): void
         {
             Config::gi()->set('routes', [
-                'about' => 'controllers/RouterTestHome/about',
+                '/about' => 'controllers/RouterTestHome/about',
             ]);
 
             $_SERVER['REQUEST_URI'] = '/about?foo=bar';

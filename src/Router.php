@@ -67,7 +67,7 @@ final class Router
         if (empty($this->project_host)) {
             trigger_error('Not specified project host', E_USER_WARNING);
         }
-        $this->project_host = rtrim($this->project_host, '/') . '/';
+        $this->project_host = rtrim($this->project_host, '/');
         Config::gi()->set('project_host', $this->project_host);
     }
 
@@ -110,7 +110,7 @@ final class Router
         }
 
         return[
-            'controller' => str_replace('/', '\\', Config::gi()->get('defaultController')),
+            'controller' => '\\' . ltrim(str_replace('/', '\\', Config::gi()->get('defaultController')), '\\'),
             'method' => Config::gi()->get('defaultMethod'),
             'vars' => [],
         ];
