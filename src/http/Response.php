@@ -107,24 +107,25 @@ class Response
      *
      * @param string $uri
      * @param int $code
-     * @return never
+     * @return static
      */
-    public function redirect(string $uri, int $code = 302): never
+    public function redirect(string $uri, int $code = 302): static
     {
-        if (DRAGON_DEBUG) {
-            header('Content-Type: text/html');
-            echo
-            new \Dragon\View('/views/elements/debug/backtrace', [
-                'bt' => debug_backtrace(),
-                'url' => $uri,
-                'code' => $code,
-            ])->render();
-            exit();
-        }
+        $this
+            ->status($code)
+            ->header('Location', $uri);
 
-        http_response_code($code);
-        header('Location: ' . $uri);
-        exit();
+        if (DRAGON_DEBUG) {
+            $this
+                ->status(200)
+                ->html(new \Dragon\View('/views/elements/debug/backtrace', [
+                    'bt' => debug_backtrace(),
+                    'url' => $uri,
+                    'code' => $code,
+                ])->render());
+        }
+                
+        return $this;
     }
 
     /**
