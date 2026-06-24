@@ -67,7 +67,7 @@ final class Router
         if (empty($this->project_host)) {
             trigger_error('Not specified project host', E_USER_WARNING);
         }
-        $this->project_host = rtrim($this->project_host, '/') . '/';
+        $this->project_host = rtrim($this->project_host, '/');
         Config::gi()->set('project_host', $this->project_host);
     }
 
@@ -79,66 +79,35 @@ final class Router
         foreach (Config::gi()->get('routes', []) as $key => $value) {
             if (is_array($value)) {
                 $controller = str_replace('\\', '/', $key);
-
                 foreach ($value as $mask => $route) {
-                    if (!is_string($mask)) {
-                        $mask = $key . '/' . $route;
-                    }
                     $this->routes[$mask] = $controller . '/' . $route;
                 }
             } else {
-                if (!is_string($key)) {
-                    $key = $value;
-                }
-
-                $value = str_replace('\\', '/', $value);
-
-                $this->routes[$key] = $value;
+                $this->routes[$key] = str_replace('\\', '/', $value);
             }
         }
     }
 
     /**
-     * Extract the routable path from the current HTTP request.
-     * Strips the query string and normalises the result.
-     *
-     * @return string
-     */
-    private function extractPath(): string
-    {
-        $path = explode('?', $_SERVER['REQUEST_URI'] ?? '')[0];
-        return str_replace(['//', '../'], '/', trim(parse_url($path, PHP_URL_PATH) ?? '', '/'));
-    }
-
-    /**
      * Resolve the current request to a controller/method/vars array.
-     * Reads default controller and method from Config.
-     * Falls back to defaults when no route matches.
      *
      * @return array
      */
     public function resolve(): array
     {
-        $cmv = [
-            'controller' => str_replace('/', '\\', Config::gi()->get('defaultController')),
-            'method' => Config::gi()->get('defaultMethod'),
-            'vars' => [],
-        ];
-
-        $path = $this->extractPath();
-
+        $path = str_replace(['//', '../'], '/', parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
         if (!empty($path)) {
             $found = $this->findRoute($path);
             if (!empty($found)) {
-                $cmv = $found;
-            } else {
-                $cmv['vars'] = explode('/', $path);
+                return $found;
             }
         }
 
-        $cmv['controller'] = '\\' . ltrim($cmv['controller'], '\\');
-
-        return $cmv;
+        return[
+            'controller' => '\\' . ltrim(str_replace('/', '\\', Config::gi()->get('defaultController')), '\\'),
+            'method' => Config::gi()->get('defaultMethod'),
+            'vars' => [],
+        ];
     }
 
     /**
@@ -148,7 +117,7 @@ final class Router
      */
     public function getHost(): string
     {
-        return $this->project_host;
+        return rtrim($this->project_host, '/') . '/';
     }
 
     /**
@@ -369,8 +338,8 @@ final class Router
             }
 
             $output = [
-                'method' => $method,
                 'controller' => '\\' . implode('\\', $parts),
+                'method' => $method,
                 'vars' => $vars,
             ];
         }

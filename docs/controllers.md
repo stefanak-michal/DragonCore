@@ -114,3 +114,14 @@ In this example:
 - `index()` reads input from the request, prepares view data, and returns the modified response.
 - `Render` middleware runs around the controller action and converts the view into the final HTML response.
 - `apiUser()` returns JSON directly, so it does not need view rendering logic in the action itself.
+
+## Default controller and method
+
+When you are in need to handle missing routes, you can add fallback controller to handle this requests. Add to your config file following keys:
+
+```php
+'defaultController' => 'controllers/Homepage',
+'defaultMethod' => 'missing',
+```
+
+_Without this configuration opening missing route will end up throwing RuntimeException._
