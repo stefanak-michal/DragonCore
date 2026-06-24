@@ -28,6 +28,48 @@ final class Application
      */
     public static $method;
 
+    public function __construct()
+    {
+        if (!defined('DS')) {
+            define('DS', DIRECTORY_SEPARATOR);
+        }
+
+        if (!defined('APP_PATH')) {
+            define('APP_PATH', dirname(get_included_files()[0]));
+        }
+
+        if (!defined('CORE_PATH')) {
+            define('CORE_PATH', __DIR__ . DS . 'src');
+        }
+
+        if (!defined('IS_WORKSPACE')) {
+            $workspace = false;
+            if (
+                file_exists(APP_PATH . DS . 'config' . DS . 'development' . DS)
+                || in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'])
+            ) {
+                $workspace = true;
+            }
+            define('IS_WORKSPACE', $workspace);
+        }
+
+        if (!defined('IS_CLI')) {
+            define('IS_CLI', php_sapi_name() == 'cli');
+        }
+        if (IS_CLI) {
+            set_time_limit(0);
+        }
+
+        if (!defined('DRAGON_DEBUG')) {
+            if (Config::gi()->get('debug') !== null) {
+                $debug = !empty(Config::gi()->get('debug'));
+            } else {
+                $debug = IS_WORKSPACE;
+            }
+            define('DRAGON_DEBUG', $debug);
+        }
+    }
+
     /**
      * Run a project
      */

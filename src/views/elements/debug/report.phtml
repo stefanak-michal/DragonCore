@@ -115,9 +115,9 @@
   Last: <a href="<?= $last ?>"><?= $last ?></a><br>
   <br>
   <ul>
-    <? foreach ($tabs as $key): ?>
+    <?php foreach ($tabs as $key): ?>
       <li class="<?= $key == reset($tabs) ? 'active' : '' ?>" data-tab="<?= $key ?>"><?= $key ?> (<?= $counts[$key] ?? 0 ?>)</li>
-    <? endforeach; ?>
+    <?php endforeach; ?>
   </ul>
 
   <?= $tables ?>
