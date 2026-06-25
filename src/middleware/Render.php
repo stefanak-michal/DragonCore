@@ -21,9 +21,23 @@ class Render implements IMiddleware
 
         $response = $next($response);
 
+        $code = $response->getStatus();
+        if (DRAGON_DEBUG && $code >= 300 && $code < 400) {
+            $uri = $response->getHeaders()['Location'] ?? '';
+            $response
+                ->status(203)
+                ->header('Location', '')
+                ->html(new \Dragon\View('/views/elements/debug/backtrace', [
+                    'bt' => debug_backtrace(),
+                    'url' => $uri,
+                    'code' => $code,
+                    ])->render());
+            return $response;
+        }
+
         $content = \Dragon\View::gi()->render();
         $pos = strrpos($content, '</body>');
-        if (IS_WORKSPACE && $pos !== false) {
+        if (DRAGON_DEBUG && $pos !== false) {
             $content = substr_replace($content, \Dragon\Debug::onsite(), $pos, 0);
         }
         return $response->html($content);

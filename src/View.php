@@ -142,8 +142,6 @@ final class View
             return !empty($this->layout) ? $this->layouted('') : '';
         }
 
-        Debug::files($this->view);
-
         ob_start();
 
         if (!empty($this->vars)) {
@@ -176,8 +174,6 @@ final class View
      */
     private function layouted(string $content): string
     {
-        Debug::files($this->layout);
-
         ob_start();
 
         if (!empty($this->vars)) {
