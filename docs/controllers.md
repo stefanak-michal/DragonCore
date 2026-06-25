@@ -67,7 +67,7 @@ Typical controller usage is validation, reading route parameters, reading form o
 - `$response->body('plain text')` sets the raw body.
 - `$response->html($html)` sets HTML output and the `Content-Type` header.
 - `$response->json($data)` encodes JSON and sets the `Content-Type` header.
-- `$response->redirect('/login')` sends a redirect response immediately.
+- `$response->redirect('/login')` set required values for redirect.
 
 In practice, controller methods usually return a modified response, for example JSON for an API endpoint or an HTML response produced by middleware such as `\Dragon\middleware\Render`.
 
