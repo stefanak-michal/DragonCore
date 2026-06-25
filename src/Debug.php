@@ -55,12 +55,8 @@ final class Debug
 
         if (!empty($args)) {
             foreach ($args as $one) {
-                ob_start();
-                var_dump($one);
-                $content = ob_get_clean();
-
                 self::$tables[__FUNCTION__][] = [
-                    'dump' => '<details><summary>' . $content . '</summary>' . self::backtrace() . '</details>',
+                    'dump' => '<details><summary><code style="white-space: pre;">' . var_export($one, true) . '</code></summary>' . self::backtrace() . '</details>',
                 ];
             }
         }
@@ -238,7 +234,7 @@ final class Debug
                 'URI' => $match[1],
                 'date' => \DateTime::createFromFormat('U.u', $time[1])->format('Y-m-d H:i:s.u'),
                 '' =>
-                '<a href="' . Router::gi()->getHost() . 'tmp/debug/' . $time[1] . '.html" target="_blank">view</a>',
+                    '<a href="' . Router::gi()->getHost() . 'tmp/debug/' . $time[1] . '.html" target="_blank">view</a>',
             ];
         }
     }
