@@ -158,8 +158,6 @@ final class Config
     public function loadLookupTable(string $filepath): bool
     {
         if (file_exists($filepath)) {
-            Debug::files($filepath);
-
             (function () use ($filepath) {
                 include $filepath;
                 $defined = get_defined_vars();
@@ -182,8 +180,6 @@ final class Config
     public function loadConfig(string $filepath): bool
     {
         if (file_exists($filepath)) {
-            Debug::files($filepath);
-
             (function () use ($filepath) {
                 include $filepath;
                 $defined = get_defined_vars();

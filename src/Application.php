@@ -42,17 +42,6 @@ final class Application
             define('CORE_PATH', __DIR__);
         }
 
-        if (!defined('IS_WORKSPACE')) {
-            $workspace = false;
-            if (
-                file_exists(APP_PATH . DS . 'config' . DS . 'development' . DS)
-                || in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1'])
-            ) {
-                $workspace = true;
-            }
-            define('IS_WORKSPACE', $workspace);
-        }
-
         if (!defined('IS_CLI')) {
             define('IS_CLI', php_sapi_name() == 'cli');
         }
@@ -61,12 +50,7 @@ final class Application
         }
 
         if (!defined('DRAGON_DEBUG')) {
-            if (Config::gi()->get('debug') !== null) {
-                $debug = !empty(Config::gi()->get('debug'));
-            } else {
-                $debug = IS_WORKSPACE;
-            }
-            define('DRAGON_DEBUG', $debug);
+            define('DRAGON_DEBUG', (bool)Config::gi()->get('debug'));
         }
     }
 

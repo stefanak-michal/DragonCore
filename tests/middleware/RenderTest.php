@@ -55,9 +55,6 @@ namespace {
             if (!defined('DRAGON_DEBUG')) {
                 define('DRAGON_DEBUG', false);
             }
-            if (!defined('IS_WORKSPACE')) {
-                define('IS_WORKSPACE', false);
-            }
 
             self::$viewsDir = APP_PATH . DS . 'views';
         }

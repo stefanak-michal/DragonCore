@@ -87,14 +87,6 @@ class Assets
      */
     public static function generateUrl(string $name): string
     {
-        //auto add "min" on production if the file is available
-        if (!IS_WORKSPACE && strpos($name, '.min.') === false) {
-            $file = substr_replace($name, '.min.', strrpos($name, '.'), 1);
-            if (file_exists(APP_PATH . DS . 'assets' . DS . $file)) {
-                $name = $file;
-            }
-        }
-
         if (!file_exists(APP_PATH . DS . 'assets' . DS . str_replace(['/', '\\'], DS, $name))) {
             return '';
         }

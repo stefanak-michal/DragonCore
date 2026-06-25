@@ -6,12 +6,9 @@
 
 **CORE_PATH** - src directory of framework (without directory separator at end)
 
-**IS_WORKSPACE** - if it's running on working platform  
-This is identified by ip localhost or 127.0.0.1, or if directory `<app>/config/development` exists.
-
 **IS_CLI** - if it's running as script
 
-**DRAGON_DEBUG** - if it's debug system turned on
+**DRAGON_DEBUG** - if it's debug system turned on. It can be set via Config key 'debug'.
 
 ## Customization
 

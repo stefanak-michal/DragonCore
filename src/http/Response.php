@@ -111,21 +111,9 @@ class Response
      */
     public function redirect(string $uri, int $code = 302): static
     {
-        $this
+        return $this
             ->status($code)
             ->header('Location', $uri);
-
-        if (DRAGON_DEBUG) {
-            $this
-                ->status(200)
-                ->html(new \Dragon\View('/views/elements/debug/backtrace', [
-                    'bt' => debug_backtrace(),
-                    'url' => $uri,
-                    'code' => $code,
-                ])->render());
-        }
-                
-        return $this;
     }
 
     /**

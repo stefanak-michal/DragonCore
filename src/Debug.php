@@ -47,7 +47,7 @@ final class Debug
      * Dump data
      * @param mixed ...$args
      */
-    public static function var_dump(...$args)
+    public static function var_dump(...$args): void
     {
         if (self::init()) {
             return;
@@ -67,12 +67,18 @@ final class Debug
     }
 
     /**
-     * List of loaded files
+     * Log loaded file
      * @param string $file
      */
-    public static function files(string $file)
+    public static function file(string $file): void
     {
         if (self::init()) {
+            return;
+        }
+
+        if (array_any(self::$tables[__FUNCTION__] ?? [], function ($row) use ($file) {
+            return $row['file'] === $file;
+        })) {
             return;
         }
 
@@ -86,17 +92,9 @@ final class Debug
             . self::backtrace()
             . '</details>';
 
-        foreach (self::$tables[__FUNCTION__] ?? [] as $i => $row) {
-            if ($row['file'] == $str) {
-                self::$tables[__FUNCTION__][$i]['hits'] += 1;
-                return;
-            }
-        }
-
         self::$tables[__FUNCTION__][] = [
             'file' => $str,
             'size (bytes)' => $exists ? filesize($file) : 0,
-            'hits' => 1,
         ];
     }
 
@@ -104,7 +102,7 @@ final class Debug
      * Measure time
      * @param string $key
      */
-    public static function timer(string $key)
+    public static function timer(string $key): void
     {
         if (self::init()) {
             return;
@@ -122,56 +120,26 @@ final class Debug
     }
 
     /**
-     * Database queries
+     * Log database query
      * @param string $query
      * @param array $hidden
      * @param array $otherColumns
      */
-    public static function query(string $query, array $hidden = [], array $otherColumns = [])
+    public static function query(string $query, array $hidden = [], array $otherColumns = []): void
     {
         if (self::init()) {
             return;
         }
 
         $query = '<details><summary>' . $query . '</summary>';
-
         if (!empty($hidden)) {
-            $html = '<table style=" border-spacing: 0; ">';
-
-            if (is_array(reset($hidden))) {
-                $html .= '<thead><tr>';
-                foreach (array_keys(reset($hidden)) as $key) {
-                    $html .= '<th>' . $key . '</th>';
-                }
-                $html .= '</tr></thead>';
-            }
-
-            $html .= '<tbody>';
-            foreach ($hidden as $row) {
-                $html .= '<tr>';
-                if (is_array($row)) {
-                    foreach ($row as $value) {
-                        $html .= '<td>' . var_export($value, true) . '</td>';
-                    }
-                } else {
-                    $html .= '<td>' . var_export($row, true) . '</td>';
-                }
-                $html .= '</tr>';
-            }
-            $html .= '</tbody></table>';
-
-            $query .= $html;
+            $query .= '<pre>' . var_export($hidden, true) . '</pre>';
         }
-
         $query .= '</details>';
 
         self::$tables[__FUNCTION__][] = array_merge(['query' => $query], $otherColumns);
     }
 
-    /**
-     * Format Exception backtrace for print
-     * @return string
-     */
     private static function backtrace(): string
     {
         $values = [];
@@ -187,12 +155,11 @@ final class Debug
         return '<pre>' . implode('<br>', $values) . '</pre>';
     }
 
-    /**
-     * Generate debug html file from collected data
-     */
-    public static function generate()
+    public static function generate(): void
     {
         self::updateHistory();
+        self::updateLoadedFiles();
+
         foreach (array_keys(self::$timers) as $key) {
             self::timer($key);
         }
@@ -223,10 +190,7 @@ final class Debug
         self::$tables = [];
     }
 
-    /**
-     * Clean up tmp debug files
-     */
-    private static function updateHistory()
+    private static function updateHistory(): void
     {
         $path = APP_PATH . DS . 'tmp' . DS . 'debug' . DS;
         if (!file_exists($path)) {
@@ -250,10 +214,14 @@ final class Debug
         self::history($files);
     }
 
-    /**
-     * @param array $files
-     */
-    private static function history(array $files)
+    private static function updateLoadedFiles(): void
+    {
+        foreach (get_included_files() as $file) {
+            self::file($file);
+        }
+    }
+
+    private static function history(array $files): void
     {
         self::$tables[__FUNCTION__] = [];
 
@@ -283,11 +251,18 @@ final class Debug
     private static function htmlTables(string $class = 'active'): string
     {
         $output = '';
+        $footer = [];
 
         //tabs with tables
         foreach (self::$tables as $key => $table) {
             if (empty($table)) {
                 continue;
+            }
+
+            if ($key === 'files') {
+                usort($table, function ($a, $b) {
+                    return $a['file'] <=> $b['file'];
+                });
             }
 
             $output .= '<table class="' . $class . '" id="' . $key . '" cellspacing="0">';
@@ -354,6 +329,8 @@ final class Debug
     public static function onsite(): string
     {
         self::updateHistory();
+        self::updateLoadedFiles();
+
         foreach (array_keys(self::$timers) as $key) {
             self::timer($key);
         }
