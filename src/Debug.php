@@ -130,6 +130,8 @@ final class Debug
         $query = '<details><summary>' . $query . '</summary>';
         if (!empty($hidden)) {
             $query .= '<pre>' . var_export($hidden, true) . '</pre>';
+        } else {
+            $query .= self::backtrace();
         }
         $query .= '</details>';
 

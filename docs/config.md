@@ -1,6 +1,6 @@
 # Config
 
-Configuration is held at `/config` directory. Config files directly placed in this directory are respectively merged (and overwrited) by workspace files in subdirectories (`production` and `development` directories).
+Configuration is held at `/config` directory. Config files directly placed in this directory are respectively merged (and overwrited) by workspace files in subdirectory `development`.
 
 Config supports 2 types of configuration files. Config and lookup table. These 2 types are php files with array.
 

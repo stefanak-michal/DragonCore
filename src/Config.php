@@ -56,30 +56,26 @@ final class Config
             self::$instance = new Config();
 
             if (file_exists(CORE_PATH . DS . 'config' . DS)) {
-                $dir = new \RecursiveDirectoryIterator(CORE_PATH . DS . 'config' . DS);
-                $iterator = new \RecursiveIteratorIterator($dir);
-                $regex = new \RegexIterator($iterator, '/^.+\.php$/i', \RecursiveRegexIterator::MATCH);
-
-                foreach ($regex as $file) {
-                    if (substr($file, -strlen(self::$cfgAffix)) === self::$cfgAffix) {
-                        self::$instance->loadConfig($file);
-                    } elseif (substr($file, -strlen(self::$ltAffix)) == self::$ltAffix) {
-                        self::$instance->loadLookupTable($file);
-                    }
+                foreach (glob(CORE_PATH . DS . 'config' . DS . '*' . self::$cfgAffix) as $file) {
+                    self::$instance->loadConfig($file);
+                }
+                foreach (glob(CORE_PATH . DS . 'config' . DS . '*' . self::$ltAffix) as $file) {
+                    self::$instance->loadLookupTable($file);
                 }
             }
 
             if (file_exists(APP_PATH . DS . 'config' . DS)) {
-                $dir = new \RecursiveDirectoryIterator(APP_PATH . DS . 'config' . DS);
-                $iterator = new \RecursiveIteratorIterator($dir);
-                $regex = new \RegexIterator($iterator, '/^.+\.php$/i', \RecursiveRegexIterator::MATCH);
-
-                foreach ($regex as $file) {
-                    if (substr($file, -strlen(self::$cfgAffix)) === self::$cfgAffix) {
-                        self::$instance->loadConfig($file);
-                    } elseif (substr($file, -strlen(self::$ltAffix)) == self::$ltAffix) {
-                        self::$instance->loadLookupTable($file);
-                    }
+                foreach (glob(APP_PATH . DS . 'config' . DS . '*' . self::$cfgAffix) as $file) {
+                    self::$instance->loadConfig($file);
+                }
+                foreach (glob(APP_PATH . DS . 'config' . DS . '*' . self::$ltAffix) as $file) {
+                    self::$instance->loadLookupTable($file);
+                }
+                foreach (glob(APP_PATH . DS . 'config' . DS . 'development' . DS . '*' . self::$cfgAffix) as $file) {
+                    self::$instance->loadConfig($file);
+                }
+                foreach (glob(APP_PATH . DS . 'config' . DS . 'development' . DS . '*' . self::$ltAffix) as $file) {
+                    self::$instance->loadLookupTable($file);
                 }
             }
         }
