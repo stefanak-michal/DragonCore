@@ -37,15 +37,15 @@ class Validation
      * Sanitize values to proper data types
      * @param array $data
      */
-    public static function sanitize(array &$data)
+    public static function sanitize(array &$data): void
     {
         foreach ($data as &$entry) {
             if (is_string($entry)) {
                 if (strlen($entry) == 0) {
                     $entry = null;
-                } elseif ($entry == 'true') {
+                } elseif (strtolower(trim($entry)) == 'true') {
                     $entry = true;
-                } elseif ($entry == 'false') {
+                } elseif (strtolower(trim($entry)) == 'false') {
                     $entry = false;
                 } elseif (preg_match("/^(\d|[1-9]\d+)$/", $entry)) {
                     $entry = intval($entry);
@@ -72,13 +72,6 @@ class Validation
                 return false;
             }
         }
-
-        foreach ($data as $value) {
-            if (empty($value)) {
-                return false;
-            }
-        }
-
-        return true;
+        return !array_any($data, fn ($item) => empty($item));
     }
 }
