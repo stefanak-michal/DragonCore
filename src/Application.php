@@ -30,6 +30,8 @@ final class Application
 
     public function __construct()
     {
+        Debug::timer('Application');
+
         if (!defined('DS')) {
             define('DS', DIRECTORY_SEPARATOR);
         }
@@ -76,9 +78,9 @@ final class Application
 
         $action = function (\Dragon\http\Response $response) use ($request) {
             if (method_exists(self::$controller, self::$method)) {
-                Debug::timer('Controller logic');
+                Debug::timer('Controller');
                 $response = self::$controller->{self::$method}($request, $response);
-                Debug::timer('Controller logic');
+                Debug::timer('Controller');
             }
             return $response;
         };

@@ -15,16 +15,16 @@ final class Debug
     /**
      * @var array
      */
-    private static $tables = [];
+    private static array $tables = [];
     /**
      * @var array
      */
-    private static $timers = [];
+    private static array $timers = [];
 
     /**
      * @var int
      */
-    private static $initialized = 0;
+    private static int $initialized = 0;
 
     /**
      * Initialize
@@ -32,7 +32,7 @@ final class Debug
      */
     private static function init(): bool
     {
-        if (self::$initialized == 0) {
+        if (self::$initialized === 0) {
             if (!defined('DRAGON_DEBUG')) {
                 return false;
             }
@@ -40,7 +40,7 @@ final class Debug
             self::$initialized = DRAGON_DEBUG ? 1 : 2;
         }
 
-        return self::$initialized == 2;
+        return self::$initialized === 2;
     }
 
     /**
