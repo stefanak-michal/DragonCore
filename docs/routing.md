@@ -28,6 +28,11 @@ $aConfig = [
                // <project_host>/do-something -> controllers\OtherController->someMethod()
                '/do-something' => 'someMethod'
           ],
+          
+          '/api' => [
+                // <project_host>/api/some-action -> controllers\api\Foo->someAction()
+                '/some-action' => 'controllers/api/Foo/someAction'
+]         ]
 
           // double backslash can be used too
           '/new-url' => 'controllers\\Something\\index',
