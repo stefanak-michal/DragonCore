@@ -354,5 +354,94 @@ namespace {
             $url = Router::gi()->current();
             $this->assertStringContainsString(':8080', $url);
         }
+
+        public function testRoutesControllerGrouping(): void
+        {
+            Config::gi()->set('routes', [
+                'controllers/RouterTestHome' => [
+                    '/login' => 'login',
+                    '/logout' => 'logout',
+                ]
+            ]);
+
+            $result = Router::gi()->findRoute('/login');
+            $this->assertSame('login', $result['method']);
+            $this->assertSame('\\controllers\\RouterTestHome', $result['controller']);
+
+            $url = Router::gi()->url('controllers\RouterTestHome', 'login');
+            $this->assertSame('http://example.test/login', $url);
+        }
+
+        public function testRoutesPrefixGrouping(): void
+        {
+            Config::gi()->set('routes', [
+                '/api' => [
+                    '/foo' => 'controllers/RouterTestHome/foo',
+                ]
+            ]);
+
+            $result = Router::gi()->findRoute('/api/foo');
+            $this->assertSame('foo', $result['method']);
+            $this->assertSame('\\controllers\\RouterTestHome', $result['controller']);
+
+            $url = Router::gi()->url('controllers\RouterTestHome', 'foo');
+            $this->assertSame('http://example.test/api/foo', $url);
+        }
+
+        public function testRoutesPrefixGroupingWithinControllerGrouping(): void
+        {
+            Config::gi()->set('routes', [
+                'controllers/RouterTestHome' => [
+                    '/api' => [
+                        '/foo' => 'foo',
+                    ]
+                ]
+            ]);
+
+            $result = Router::gi()->findRoute('/api/foo');
+            $this->assertSame('foo', $result['method']);
+            $this->assertSame('\\controllers\\RouterTestHome', $result['controller']);
+
+            $url = Router::gi()->url('controllers\RouterTestHome', 'foo');
+            $this->assertSame('http://example.test/api/foo', $url);
+        }
+
+        public function testControllerGroupingWithinPrefixGrouping(): void
+        {
+            Config::gi()->set('routes', [
+                '/api' => [
+                    'controllers/RouterTestHome' => [
+                        '/foo' => 'foo'
+                    ]
+                ]
+            ]);
+
+            $result = Router::gi()->findRoute('/api/foo');
+            $this->assertSame('foo', $result['method']);
+            $this->assertSame('\\controllers\\RouterTestHome', $result['controller']);
+
+            $url = Router::gi()->url('controllers\RouterTestHome', 'foo');
+            $this->assertSame('http://example.test/api/foo', $url);
+        }
+
+        public function testControllerGroupingWithinControllerGrouping(): void
+        {
+            Config::gi()->set('routes', [
+                'controllers/Foo' => [
+                    '/foo' => 'foo',
+                    'controllers/Bar' => [
+                        '/bar' => 'bar',
+                    ]
+                ]
+            ]);
+
+            $result = Router::gi()->findRoute('/foo');
+            $this->assertSame('foo', $result['method']);
+            $this->assertSame('\\controllers\\Foo', $result['controller']);
+
+            $result = Router::gi()->findRoute('/bar');
+            $this->assertSame('bar', $result['method']);
+            $this->assertSame('\\controllers\\Bar', $result['controller']);
+        }
     }
 }

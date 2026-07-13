@@ -74,16 +74,38 @@ final class Router
     /**
      * Load routes from config file and clean up grouping
      */
-    private function loadRoutes()
+    private function loadRoutes(): void
     {
-        foreach (Config::gi()->get('routes', []) as $key => $value) {
+        $this->routes = [];
+        $this->loadRoutesRecursive(Config::gi()->get('routes', []), '');
+    }
+
+    /**
+     * Recursively load routes while carrying URI prefix and last used controller grouping.
+     *
+     * @param array $routes
+     * @param string $uriPrefix
+     * @param string $lastController
+     */
+    private function loadRoutesRecursive(array $routes, string $uriPrefix, string $lastController = ''): void
+    {
+        foreach ($routes as $key => $value) {
             if (is_array($value)) {
-                $controller = str_replace('\\', '/', $key);
-                foreach ($value as $mask => $route) {
-                    $this->routes[$mask] = $controller . '/' . $route;
+                if (str_starts_with($key, '/')) {
+                    // uri prefix grouping
+                    $this->loadRoutesRecursive($value, $uriPrefix . $key, $lastController);
+                } elseif (is_string($key)) {
+                    // controller grouping
+                    $this->loadRoutesRecursive($value, $uriPrefix, trim(str_replace('\\', '/', $key), '/'));
+                } else {
+                    $this->loadRoutesRecursive($value, $uriPrefix, $lastController);
                 }
             } else {
-                $this->routes[$key] = str_replace('\\', '/', $value);
+                $route = trim(str_replace('\\', '/', (string) $value), '/');
+                if (!empty($lastController)) {
+                    $route = $lastController . '/' . $route;
+                }
+                $this->routes[$uriPrefix . $key] = $route;
             }
         }
     }
