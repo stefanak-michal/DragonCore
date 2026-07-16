@@ -41,37 +41,37 @@ class Validation
     {
         foreach ($data as &$entry) {
             if (is_string($entry)) {
-                if (strlen($entry) == 0) {
+                $entry = trim($entry);
+                if (strlen($entry) === 0) {
                     $entry = null;
-                } elseif (strtolower(trim($entry)) == 'true') {
-                    $entry = true;
-                } elseif (strtolower(trim($entry)) == 'false') {
-                    $entry = false;
-                } elseif (preg_match("/^(\d|[1-9]\d+)$/", $entry)) {
-                    $entry = intval($entry);
-                } elseif (preg_match("/^\d*\.\d+$/", $entry)) {
-                    $entry = floatval($entry);
+                    continue;
                 }
+
+                if (strtolower($entry) === 'true') {
+                    $entry = true;
+                    continue;
+                }
+                if (strtolower($entry) === 'false') {
+                    $entry = false;
+                    continue;
+                }
+
+                $result = filter_var($entry, FILTER_VALIDATE_INT);
+                if ($result !== false) {
+                    $entry = $result;
+                    continue;
+                }
+
+                $result = filter_var($entry, FILTER_VALIDATE_FLOAT);
+                if ($result !== false) {
+                    $entry = $result;
+                    continue;
+                }
+
+                $entry = htmlspecialchars($entry);
             } elseif (is_array($entry)) {
                 self::sanitize($entry);
             }
         }
-    }
-
-    /**
-     * Check if all values are not empty
-     * @param array $data
-     * @param array $keys Whitelist, left empty if you want to check all values
-     * @return bool
-     */
-    public static function filled(array &$data, array $keys = []): bool
-    {
-        if (!empty($keys)) {
-            $data = array_intersect_key($data, array_flip($keys));
-            if (count($data) != count($keys)) {
-                return false;
-            }
-        }
-        return !array_any($data, fn ($item) => empty($item));
     }
 }
