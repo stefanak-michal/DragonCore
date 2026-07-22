@@ -64,7 +64,7 @@ class ConfigTest extends TestCase
     public function testLt(): void
     {
         file_put_contents('test' . Config::$ltAffix, "<?php \$lt = ['greeting' => ['say' => 'Hello']];");
-        Config::gi()->loadLookupTable('test' . Config::$ltAffix);
+        $this->assertTrue(Config::gi()->loadLookupTable('test' . Config::$ltAffix));
         $this->assertEquals('Hello', Config::gi()->lt('greeting.say'));
         unlink('test' . Config::$ltAffix);
     }
@@ -72,9 +72,23 @@ class ConfigTest extends TestCase
     public function testConfigFileLoading(): void
     {
         file_put_contents('test' . Config::$cfgAffix, "<?php \$cfg = ['appName' => 'TestApp'];");
-        Config::gi()->loadConfig('test' . Config::$cfgAffix);
+        $this->assertTrue(Config::gi()->loadConfig('test' . Config::$cfgAffix));
         $this->assertEquals('TestApp', Config::gi()->get('appName'));
         unlink('test' . Config::$cfgAffix);
+    }
+
+    public function testLookupTableFileWithoutArrayReturnsFalse(): void
+    {
+        file_put_contents('invalid' . Config::$ltAffix, "<?php \$text = 'no-array';");
+        $this->assertFalse(Config::gi()->loadLookupTable('invalid' . Config::$ltAffix));
+        unlink('invalid' . Config::$ltAffix);
+    }
+
+    public function testConfigFileWithoutArrayReturnsFalse(): void
+    {
+        file_put_contents('invalid' . Config::$cfgAffix, "<?php \$text = 'no-array';");
+        $this->assertFalse(Config::gi()->loadConfig('invalid' . Config::$cfgAffix));
+        unlink('invalid' . Config::$cfgAffix);
     }
 
     public function testApply(): void
