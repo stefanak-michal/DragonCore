@@ -2,6 +2,14 @@
 
 namespace Dragon;
 
+use Dragon\controllers\IController;
+use Dragon\helpers\RouteTarget;
+use Dragon\http\Request;
+use Dragon\http\RequestMethod;
+use Dragon\http\Response;
+use Dragon\middleware\IMiddleware;
+use Dragon\middleware\RequiresMiddleware;
+
 /**
  * Application
  * Base class of framework
@@ -14,19 +22,13 @@ final class Application
 {
     /**
      * Instance of called controller
-     *
-     * @static
-     * @var \Dragon\controllers\IController
      */
-    public static $controller;
+    public static IController $controller;
 
     /**
      * Name of called method
-     *
-     * @static
-     * @var string
      */
-    public static $method;
+    public static string $method;
 
     public function __construct()
     {
@@ -59,24 +61,30 @@ final class Application
     /**
      * Run a project
      */
-    public function run()
+    public function run(): void
     {
-        $cmv = Router::gi()->resolve();
+        $target = Router::gi()->resolve();
 
         if (DRAGON_DEBUG) {
             header('X-Dragon-Debug: ' . Router::gi()->getHost() . 'tmp/debug/last.html');
         }
 
-        $this->loadController($cmv);
+        $request = new Request($target->vars);
+        $response = new Response();
+        $this->loadController($target);
 
-        $request = new \Dragon\http\Request($cmv['vars']);
-        $response = new \Dragon\http\Response();
+        if (!empty($target->verbs) && !in_array($request->method, $target->verbs, true)) {
+            $response
+                ->status(405)
+                ->header('Allow', implode(', ', array_map(fn (RequestMethod $verb) => $verb->value, $target->verbs)))
+                ->send();
+            return;
+        }
 
         $middlewares = method_exists(self::$controller, 'middleware') ? self::$controller->middleware() : [];
-
         $this->validateMiddlewareDependencies($middlewares);
 
-        $action = function (\Dragon\http\Response $response) use ($request) {
+        $action = function (Response $response) use ($request) {
             if (method_exists(self::$controller, self::$method)) {
                 Debug::timer('Controller');
                 $response = self::$controller->{self::$method}($request, $response);
@@ -87,8 +95,8 @@ final class Application
 
         $pipeline = array_reduce(
             array_reverse($middlewares),
-            function (callable $carry, \Dragon\middleware\IMiddleware $middleware) use ($request) {
-                return function (\Dragon\http\Response $response) use ($middleware, $carry, $request) {
+            function (callable $carry, IMiddleware $middleware) use ($request) {
+                return function (Response $response) use ($middleware, $carry, $request) {
                     return $middleware->handle($request, $response, $carry);
                 };
             },
@@ -99,24 +107,21 @@ final class Application
         $response->send();
     }
 
-    /**
-     * @param array $cmv [controller, method, vars]
-     */
-    private function loadController(array $cmv)
+    private function loadController(RouteTarget $target): void
     {
-        if (empty($cmv) or empty($cmv['controller']) or empty($cmv['method'])) {
+        if (empty($target->controller) or empty($target->method)) {
             throw new \RuntimeException('Route resolved to empty controller or method');
         }
 
-        if (!class_exists($cmv['controller'])) {
-            throw new \RuntimeException("Controller class {$cmv['controller']} not found");
+        if (!class_exists($target->controller)) {
+            throw new \RuntimeException("Controller class {$target->controller} not found");
         }
 
-        self::$method = $cmv['method'];
-        self::$controller = new $cmv['controller']();
+        self::$method = $target->method;
+        self::$controller = new $target->controller();
 
-        if (!method_exists(self::$controller, $cmv['method'])) {
-            throw new \RuntimeException("Method {$cmv['method']} not found in controller {$cmv['controller']}");
+        if (!method_exists(self::$controller, $target->method)) {
+            throw new \RuntimeException("Method {$target->method} not found in controller {$target->controller}");
         }
     }
 
@@ -124,14 +129,14 @@ final class Application
      * Validate that middleware dependencies declared via #[RequiresMiddleware]
      * are satisfied and ordered correctly in the stack.
      *
-     * @param \Dragon\middleware\IMiddleware[] $middlewares
+     * @param IMiddleware[] $middlewares
      * @throws \RuntimeException
      */
     private function validateMiddlewareDependencies(array $middlewares): void
     {
         foreach ($middlewares as $index => $middleware) {
             $ref = new \ReflectionClass($middleware);
-            $attributes = $ref->getAttributes(\Dragon\middleware\RequiresMiddleware::class);
+            $attributes = $ref->getAttributes(RequiresMiddleware::class);
 
             foreach ($attributes as $attribute) {
                 $required = $attribute->newInstance()->middleware;

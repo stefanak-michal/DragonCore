@@ -161,4 +161,9 @@ class Utils
     {
         return trim(preg_replace_callback('/[A-Z]/', fn(array $item) => '_' . strtolower($item[0]), $str), '_');
     }
+
+    public static function normalizeClassName(string $className): string
+    {
+        return '\\' . trim(str_replace('/', '\\', $className), '\\');
+    }
 }

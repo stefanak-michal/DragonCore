@@ -16,6 +16,8 @@ namespace controllers {
 namespace {
 
     use Dragon\Config;
+    use Dragon\helpers\RouteTarget;
+    use Dragon\http\RequestMethod;
     use Dragon\Router;
     use PHPUnit\Framework\TestCase;
 
@@ -127,10 +129,11 @@ namespace {
             $this->assertStringContainsString('sort=asc', $url);
         }
 
-        public function testUrlThrowsOnMissingController(): void
+        public function testUrlAllowsUnknownControllerString(): void
         {
-            $this->expectException(\InvalidArgumentException::class);
-            Router::gi()->url('NonExistentClass', 'index');
+            $url = Router::gi()->url('NonExistentClass', 'index');
+            $this->assertStringStartsWith('http://example.test', $url);
+            $this->assertStringEndsWith('NonExistentClass/index', $url);
         }
 
         public function testUrlFallbackWithVars(): void
@@ -196,9 +199,10 @@ namespace {
             ]);
 
             $result = Router::gi()->findRoute('/about');
-            $this->assertSame('about', $result['method']);
-            $this->assertSame('\\controllers\\RouterTestHome', $result['controller']);
-            $this->assertSame([], $result['vars']);
+            $this->assertInstanceOf(RouteTarget::class, $result);
+            $this->assertSame('about', $result->method);
+            $this->assertSame('\\controllers\\RouterTestHome', $result->controller);
+            $this->assertSame([], $result->vars);
         }
 
         public function testFindRouteWithInt(): void
@@ -208,9 +212,9 @@ namespace {
             ]);
 
             $result = Router::gi()->findRoute('/user/42');
-            $this->assertSame('show', $result['method']);
-            $this->assertSame([42], $result['vars']);
-            $this->assertIsInt($result['vars'][0]);
+            $this->assertSame('show', $result->method);
+            $this->assertSame([42], $result->vars);
+            $this->assertIsInt($result->vars[0]);
         }
 
         public function testFindRouteWithString(): void
@@ -220,9 +224,9 @@ namespace {
             ]);
 
             $result = Router::gi()->findRoute('/post/hello-world');
-            $this->assertSame('view', $result['method']);
-            $this->assertSame(['hello-world'], $result['vars']);
-            $this->assertIsString($result['vars'][0]);
+            $this->assertSame('view', $result->method);
+            $this->assertSame(['hello-world'], $result->vars);
+            $this->assertIsString($result->vars[0]);
         }
 
         public function testFindRouteWithFloat(): void
@@ -232,9 +236,9 @@ namespace {
             ]);
 
             $result = Router::gi()->findRoute('/price/3.14');
-            $this->assertSame('list', $result['method']);
-            $this->assertSame([3.14], $result['vars']);
-            $this->assertIsFloat($result['vars'][0]);
+            $this->assertSame('list', $result->method);
+            $this->assertSame([3.14], $result->vars);
+            $this->assertIsFloat($result->vars[0]);
         }
 
         public function testFindRouteWithMultipleVars(): void
@@ -244,8 +248,8 @@ namespace {
             ]);
 
             $result = Router::gi()->findRoute('/category/books/item/5');
-            $this->assertSame('show', $result['method']);
-            $this->assertSame(['books', 5], $result['vars']);
+            $this->assertSame('show', $result->method);
+            $this->assertSame(['books', 5], $result->vars);
         }
 
         public function testFindRouteNoMatch(): void
@@ -255,7 +259,7 @@ namespace {
             ]);
 
             $result = Router::gi()->findRoute('/no/such/path');
-            $this->assertEmpty($result);
+            $this->assertNull($result);
         }
 
         public function testFindRouteIsCaseInsensitive(): void
@@ -265,7 +269,7 @@ namespace {
             ]);
 
             $result = Router::gi()->findRoute('/about');
-            $this->assertSame('about', $result['method']);
+            $this->assertSame('about', $result->method);
         }
 
         public function testResolveDefaultWhenPathEmpty(): void
@@ -273,10 +277,11 @@ namespace {
             $_SERVER['REQUEST_URI'] = '/';
             $result = Router::gi()->resolve();
 
-            $this->assertSame('index', $result['method']);
-            $this->assertStringStartsWith('\\', $result['controller']);
-            $this->assertStringContainsString('controllers', $result['controller']);
-            $this->assertSame([], $result['vars']);
+            $this->assertInstanceOf(RouteTarget::class, $result);
+            $this->assertSame('index', $result->method);
+            $this->assertStringStartsWith('\\', $result->controller);
+            $this->assertStringContainsString('controllers', $result->controller);
+            $this->assertSame([], $result->vars);
         }
 
         public function testResolveWithMatchedRoute(): void
@@ -287,7 +292,7 @@ namespace {
 
             $_SERVER['REQUEST_URI'] = '/about';
             $result = Router::gi()->resolve();
-            $this->assertSame('about', $result['method']);
+            $this->assertSame('about', $result->method);
         }
 
         public function testResolveWithRouteVars(): void
@@ -298,8 +303,8 @@ namespace {
 
             $_SERVER['REQUEST_URI'] = '/user/99';
             $result = Router::gi()->resolve();
-            $this->assertSame('show', $result['method']);
-            $this->assertSame([99], $result['vars']);
+            $this->assertSame('show', $result->method);
+            $this->assertSame([99], $result->vars);
         }
 
         public function testResolveStripsQueryString(): void
@@ -310,7 +315,38 @@ namespace {
 
             $_SERVER['REQUEST_URI'] = '/about?foo=bar';
             $result = Router::gi()->resolve();
-            $this->assertSame('about', $result['method']);
+            $this->assertSame('about', $result->method);
+        }
+
+        public function testFindRouteWithRouteTargetValue(): void
+        {
+            Config::gi()->set('routes', [
+                '/about' => new RouteTarget('controllers/RouterTestHome', 'about', [RequestMethod::GET]),
+            ]);
+
+            $result = Router::gi()->findRoute('/about');
+            $this->assertInstanceOf(RouteTarget::class, $result);
+            $this->assertSame('about', $result->method);
+            $this->assertSame('\\controllers\\RouterTestHome', $result->controller);
+            $this->assertSame([RequestMethod::GET], $result->verbs);
+        }
+
+        public function testControllerGroupingFillsRouteTargetController(): void
+        {
+            Config::gi()->set('routes', [
+                'controllers/RouterTestHome' => [
+                    '/about' => new RouteTarget(method: 'about', verbs: [RequestMethod::POST]),
+                ],
+            ]);
+
+            $result = Router::gi()->findRoute('/about');
+            $this->assertInstanceOf(RouteTarget::class, $result);
+            $this->assertSame('about', $result->method);
+            $this->assertSame('\\controllers\\RouterTestHome', $result->controller);
+            $this->assertSame([RequestMethod::POST], $result->verbs);
+
+            $url = Router::gi()->url('controllers\\RouterTestHome', 'about');
+            $this->assertSame('http://example.test/about', $url);
         }
 
         public function testCurrentWithoutQueryParams(): void
@@ -365,8 +401,8 @@ namespace {
             ]);
 
             $result = Router::gi()->findRoute('/login');
-            $this->assertSame('login', $result['method']);
-            $this->assertSame('\\controllers\\RouterTestHome', $result['controller']);
+            $this->assertSame('login', $result->method);
+            $this->assertSame('\\controllers\\RouterTestHome', $result->controller);
 
             $url = Router::gi()->url('controllers\RouterTestHome', 'login');
             $this->assertSame('http://example.test/login', $url);
@@ -381,8 +417,8 @@ namespace {
             ]);
 
             $result = Router::gi()->findRoute('/api/foo');
-            $this->assertSame('foo', $result['method']);
-            $this->assertSame('\\controllers\\RouterTestHome', $result['controller']);
+            $this->assertSame('foo', $result->method);
+            $this->assertSame('\\controllers\\RouterTestHome', $result->controller);
 
             $url = Router::gi()->url('controllers\RouterTestHome', 'foo');
             $this->assertSame('http://example.test/api/foo', $url);
@@ -399,8 +435,8 @@ namespace {
             ]);
 
             $result = Router::gi()->findRoute('/api/foo');
-            $this->assertSame('foo', $result['method']);
-            $this->assertSame('\\controllers\\RouterTestHome', $result['controller']);
+            $this->assertSame('foo', $result->method);
+            $this->assertSame('\\controllers\\RouterTestHome', $result->controller);
 
             $url = Router::gi()->url('controllers\RouterTestHome', 'foo');
             $this->assertSame('http://example.test/api/foo', $url);
@@ -417,8 +453,8 @@ namespace {
             ]);
 
             $result = Router::gi()->findRoute('/api/foo');
-            $this->assertSame('foo', $result['method']);
-            $this->assertSame('\\controllers\\RouterTestHome', $result['controller']);
+            $this->assertSame('foo', $result->method);
+            $this->assertSame('\\controllers\\RouterTestHome', $result->controller);
 
             $url = Router::gi()->url('controllers\RouterTestHome', 'foo');
             $this->assertSame('http://example.test/api/foo', $url);
@@ -436,12 +472,12 @@ namespace {
             ]);
 
             $result = Router::gi()->findRoute('/foo');
-            $this->assertSame('foo', $result['method']);
-            $this->assertSame('\\controllers\\Foo', $result['controller']);
+            $this->assertSame('foo', $result->method);
+            $this->assertSame('\\controllers\\Foo', $result->controller);
 
             $result = Router::gi()->findRoute('/bar');
-            $this->assertSame('bar', $result['method']);
-            $this->assertSame('\\controllers\\Bar', $result['controller']);
+            $this->assertSame('bar', $result->method);
+            $this->assertSame('\\controllers\\Bar', $result->controller);
         }
     }
 }

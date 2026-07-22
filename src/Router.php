@@ -2,6 +2,8 @@
 
 namespace Dragon;
 
+use Dragon\helpers\RouteTarget;
+
 /**
  * Router
  * Work with URI
@@ -14,36 +16,23 @@ final class Router
 {
     /**
      * Base for all URI
-     *
-     * @var string
      */
-    private $project_host;
+    private string $project_host;
 
     /**
      * Definition of allowed routes from config file
-     *
-     * @var array
+     * @var RouteTarget[]
      */
-    private $routes = [];
+    private array $routes = [];
 
-    /**
-     * @var array
-     */
-    private $masksCache = [];
-
-    /**
-     * @var Router
-     */
-    private static $instance;
+    private static ?Router $instance = null;
 
     /**
      * Singleton
-     *
-     * @return Router
      */
     public static function gi(): Router
     {
-        if (self::$instance == null) {
+        if (self::$instance === null) {
             self::$instance = new Router();
         }
 
@@ -91,7 +80,7 @@ final class Router
     {
         foreach ($routes as $key => $value) {
             if (is_array($value)) {
-                if (str_starts_with($key, '/')) {
+                if (str_starts_with((string)$key, '/')) {
                     // uri prefix grouping
                     $this->loadRoutesRecursive($value, $uriPrefix . $key, $lastController);
                 } elseif (is_string($key)) {
@@ -100,11 +89,19 @@ final class Router
                 } else {
                     $this->loadRoutesRecursive($value, $uriPrefix, $lastController);
                 }
+            } elseif ($value instanceof RouteTarget) {
+                if ($value->controller === null) {
+                    $value->controller = $lastController;
+                }
+                $this->routes[$uriPrefix . $key] = $value;
             } else {
-                $route = trim(str_replace('\\', '/', (string) $value), '/');
+                $route = trim(str_replace('\\', '/', $value), '/');
                 if (!empty($lastController)) {
                     $route = $lastController . '/' . $route;
                 }
+                $parts = array_filter(explode('/', $route));
+                $method = array_pop($parts);
+                $route = new RouteTarget(implode('/', $parts), $method, []);
                 $this->routes[$uriPrefix . $key] = $route;
             }
         }
@@ -112,24 +109,21 @@ final class Router
 
     /**
      * Resolve the current request to a controller/method/vars array.
-     *
-     * @return array
      */
-    public function resolve(): array
+    public function resolve(): RouteTarget
     {
         $path = str_replace(['//', '../'], '/', parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
         if (!empty($path)) {
             $found = $this->findRoute($path);
-            if (!empty($found)) {
+            if ($found !== null) {
                 return $found;
             }
         }
 
-        return[
-            'controller' => '\\' . ltrim(str_replace('/', '\\', Config::gi()->get('defaultController')), '\\'),
-            'method' => Config::gi()->get('defaultMethod'),
-            'vars' => [],
-        ];
+        return new RouteTarget(
+            Config::gi()->get('defaultController'),
+            Config::gi()->get('defaultMethod'),
+        );
     }
 
     /**
@@ -147,14 +141,14 @@ final class Router
      *
      * @param bool $secure
      */
-    public function setSecureHost(bool $secure = true)
+    public function setSecureHost(bool $secure = true): void
     {
         if ($secure) {
-            if (strpos($this->project_host, 'https') === false) {
+            if (!str_contains($this->project_host, 'https')) {
                 $this->project_host = str_replace('http', 'https', $this->project_host);
             }
         } else {
-            if (strpos($this->project_host, 'https') !== false) {
+            if (str_contains($this->project_host, 'https')) {
                 $this->project_host = str_replace('https', 'http', $this->project_host);
             }
         }
@@ -180,7 +174,7 @@ final class Router
     /**
      * Generate URI
      *
-     * @param string $controller className
+     * @param string $controller Controller::class
      * @param string $method
      * @param array $vars
      * @param array $query
@@ -189,13 +183,16 @@ final class Router
      */
     public function url(string $controller, string $method = 'index', array $vars = [], array $query = []): string
     {
-        if (empty($controller) || empty($method) || !class_exists($controller)) {
+        if (empty($controller) || empty($method)) {
             throw new \InvalidArgumentException('Missing required parameters.');
         }
+        $controller = \Dragon\helpers\Utils::normalizeClassName($controller);
 
         $uri = '';
-        $controller = str_replace('\\', '/', $controller);
-        foreach ($this->getMasks($controller, $method) as $mask) {
+        foreach (array_filter(
+                     $this->routes,
+                     fn(RouteTarget $target) => is_string($target->controller) && $target->controller === $controller && $target->method === $method
+                 ) as $mask => $_) {
             //check number of defined variables against mask
             if (count($vars) != preg_match_all('/%[dis]/', $mask)) {
                 continue;
@@ -207,11 +204,11 @@ final class Router
         }
 
         if (empty($uri)) {
-            $uri = $this->project_host . $controller . '/' . $method;
+            $uri = $this->project_host . trim(str_replace('\\', '/', $controller), '/') . '/' . $method;
             if (!empty($vars)) {
                 $uri .= '/' . implode('/', array_map(function ($value) {
-                    return filter_var($value, FILTER_SANITIZE_ENCODED);
-                }, $vars));
+                        return filter_var($value, FILTER_SANITIZE_ENCODED);
+                    }, $vars));
             }
         }
 
@@ -222,11 +219,7 @@ final class Router
         return $uri;
     }
 
-    /**
-     * @param string $mask
-     * @param array $vars
-     */
-    private function replaceMaskVariables(string &$mask, array $vars)
+    private function replaceMaskVariables(string &$mask, array $vars): void
     {
         if (empty($vars)) {
             return;
@@ -236,11 +229,11 @@ final class Router
         while (preg_match('/%[dis]/', $mask, $match)) {
             switch ($match[0]) {
                 case '%d':
-                    $mask = preg_replace('/%d/', (string) floatval($vars[$i]), $mask, 1);
+                    $mask = preg_replace('/%d/', (string)floatval($vars[$i]), $mask, 1);
                     break;
 
                 case '%i':
-                    $mask = preg_replace('/%i/', (string) intval($vars[$i]), $mask, 1);
+                    $mask = preg_replace('/%i/', (string)intval($vars[$i]), $mask, 1);
                     break;
 
                 case '%s':
@@ -253,28 +246,7 @@ final class Router
     }
 
     /**
-     * Get cached masks for requested controller/method
-     * Method url can be called so many times and caching this improves performance
-     * @param string $controller
-     * @param string $method
-     * @return array
-     */
-    private function getMasks(string $controller, string $method)
-    {
-        if (empty($this->masksCache)) {
-            foreach ($this->routes as $mask => $value) {
-                $this->masksCache[$value][] = $mask;
-            }
-        }
-
-        return $this->masksCache[$controller . '/' . $method] ?? [];
-    }
-
-    /**
      * Get actual URI
-     *
-     * @param bool $getParams
-     * @return string
      */
     public function current(bool $getParams = false): string
     {
@@ -292,45 +264,27 @@ final class Router
 
         $uri .= $_SERVER['REQUEST_URI'];
 
-        if (!$getParams and strpos($uri, '?') !== false) {
+        if (!$getParams and str_contains($uri, '?')) {
             $uri = substr($uri, 0, strpos($uri, '?'));
         }
 
         return $uri;
     }
 
-    /**
-     * Find route
-     *
-     * @param string $path
-     * @return array
-     */
-    public function findRoute(string $path): array
+    public function findRoute(string $path): ?RouteTarget
     {
-        $output = array();
-
         foreach ($this->routes as $mask => $route) {
             $output = $this->match($path, $mask, $route);
-            if (!empty($output)) {
-                break;
+            if ($output !== null) {
+                return $output;
             }
         }
 
-        return $output;
+        return null;
     }
 
-    /**
-     * Match specific route
-     *
-     * @param string $path
-     * @param string|int $mask
-     * @param string $route
-     * @return array
-     */
-    private function match(string $path, string|int $mask, string $route): array
+    private function match(string $path, string|int $mask, RouteTarget $route): ?RouteTarget
     {
-        $output = [];
-
         // Capture token types in declaration order before replacing with regex patterns
         preg_match_all('/%[isd]/', $mask, $tokenMatches);
         $tokenTypes = $tokenMatches[0];
@@ -346,26 +300,21 @@ final class Router
         $pattern .= '$/i';
 
         if (preg_match($pattern, $path, $vars)) {
-            $parts = array_filter(explode('/', str_replace('\\', '/', $route)));
-            $method = array_pop($parts);
             array_shift($vars);
             $vars = array_values($vars);
 
             foreach ($vars as $i => $var) {
                 $vars[$i] = match ($tokenTypes[$i] ?? '%s') {
-                    '%i' => (int) $var,
-                    '%d' => (float) $var,
+                    '%i' => (int)$var,
+                    '%d' => (float)$var,
                     default => $var,
                 };
             }
 
-            $output = [
-                'controller' => '\\' . implode('\\', $parts),
-                'method' => $method,
-                'vars' => $vars,
-            ];
+            $route->vars = $vars;
+            return $route;
         }
 
-        return $output;
+        return null;
     }
 }
