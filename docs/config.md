@@ -1,8 +1,8 @@
 # Config
 
-Configuration is held at `/config` directory. Config files directly placed in this directory are respectively merged (and overwrited) by workspace files in subdirectory `development`.
+Configuration is held at `/config` directory. Config files directly placed in this directory are respectively merged (and overwritten) by workspace files in subdirectory `development`.
 
-Config supports 2 types of configuration files. Config and lookup table. These 2 types are php files with array.
+Config supports 2 types of configuration files - config and lookup table. These are php files with array variable with any name. If the file contains more than one variable, first array variable is used and everything else is ignored.
 
 System is auto loading all files in config directory.
 
@@ -24,7 +24,7 @@ File extensions for config files can be changed on static properties:
 
 ## Look up table
 
-It's for specific access to array. To store custom enumerations or required structures. Access to content of it is through dot seperated keys.
+It's for specific access to array. To store custom enumerations or required structures. Access to content of it is through dot separated keys.
 
 Example (of course I know you can call `pi()`):
 
@@ -45,6 +45,6 @@ $pi = \Dragon\Config::gi()->lt('math.pi');
 
 ## Auto apply config
 
-Config class contains static method `apply`. This method accept first argument instance of any class and second argument key from loaded configuration. Main purpose is to call on class, where you want to set up different properties. 
+Config class contains static method `apply`. This method accepts first argument instance of any class and second argument key from loaded configuration. Main purpose is to call on class, where you want to set up different properties. 
 
 Look into [Email](emails.md), and you can see usage of it in `\Dragon\components\Email->_send()`.

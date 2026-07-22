@@ -153,18 +153,19 @@ final class Config
      */
     public function loadLookupTable(string $filepath): bool
     {
+        $merged = false;
         if (file_exists($filepath)) {
-            (function () use ($filepath) {
-                include $filepath;
-                $defined = get_defined_vars();
-                unset($defined['filepath']);
-                $this->lookUpTables = array_replace_recursive($this->lookUpTables, reset($defined));
-            })();
-
-            return true;
+            include $filepath;
+            $defined = get_defined_vars();
+            foreach ($defined as $value) {
+                if (is_array($value)) {
+                    $this->lookUpTables = array_replace_recursive($this->lookUpTables, $value);
+                    $merged = true;
+                    break;
+                }
+            }
         }
-
-        return false;
+        return $merged;
     }
 
     /**
@@ -175,18 +176,19 @@ final class Config
      */
     public function loadConfig(string $filepath): bool
     {
+        $merged = false;
         if (file_exists($filepath)) {
-            (function () use ($filepath) {
-                include $filepath;
-                $defined = get_defined_vars();
-                unset($defined['filepath']);
-                $this->configVars = array_replace_recursive($this->configVars, reset($defined));
-            })();
-
-            return true;
+            include $filepath;
+            $defined = get_defined_vars();
+            foreach ($defined as $value) {
+                if (is_array($value)) {
+                    $this->configVars = array_replace_recursive($this->configVars, $value);
+                    $merged = true;
+                    break;
+                }
+            }
         }
-
-        return false;
+        return $merged;
     }
 
     /**
