@@ -140,7 +140,13 @@ class Email
      */
     public function addAttachment(string $filename, string $path): Email
     {
-        $this->attachments[$filename] = $path;
+        $this->attachments[$filename] = [1, $path];
+        return $this;
+    }
+
+    public function addStringAttachment(string $filename, string $content): Email
+    {
+        $this->attachments[$filename] = [2, $content];
         return $this;
     }
 
@@ -247,14 +253,26 @@ class Email
             $mailer->Subject = $this->title;
             $mailer->Body = $this->content;
 
-            foreach ($this->attachments as $filename => $path) {
+            foreach ($this->attachments as $filename => [$type, $content]) {
                 $dot = strrpos($filename, '.');
-                $mailer->addAttachment(
-                    $path,
-                    $filename,
-                    PHPMailer::ENCODING_BASE64,
-                    PHPMailer::_mime_types(substr($filename, $dot + 1)),
-                );
+                switch ($type) {
+                    case 1:
+                        $mailer->addAttachment(
+                            $content,
+                            $filename,
+                            PHPMailer::ENCODING_BASE64,
+                            PHPMailer::_mime_types(substr($filename, $dot + 1)),
+                        );
+                        break;
+                    case 2:
+                        $mailer->addStringAttachment(
+                            $content,
+                            $filename,
+                            PHPMailer::ENCODING_BASE64,
+                            PHPMailer::_mime_types(substr($filename, $dot + 1)),
+                        );
+                        break;
+                }
             }
 
             foreach ($this->pictures as $cid => $file) {

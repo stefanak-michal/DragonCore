@@ -67,8 +67,6 @@ class Validation
                     $entry = $result;
                     continue;
                 }
-
-                $entry = htmlspecialchars($entry);
             } elseif (is_array($entry)) {
                 self::sanitize($entry);
             }
