@@ -2,6 +2,8 @@
 
 Controllers contain the main application logic for a route. After routing resolves the target controller and method, Dragon creates a `Request`, creates a `Response`, runs the configured [middleware](middleware.md), and finally calls the controller action.
 
+_Be aware that controller constructor is called before defined middleware stack._
+
 ## Interface
 
 Controller classes should implement `\Dragon\controllers\IController`:
