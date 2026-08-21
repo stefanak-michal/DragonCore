@@ -110,7 +110,7 @@ class Assets
 
         if (!empty(self::$toLoad[self::TYPE_CSS])) {
             foreach (self::$toLoad[self::TYPE_CSS] as $file) {
-                $output[] = '<link rel="stylesheet" type="text/css" href="' . $file . '" />';
+                $output[] = '<link rel="stylesheet" href="' . $file . '" />';
             }
         }
         if (!empty(self::$toLoad[self::TYPE_JS])) {
