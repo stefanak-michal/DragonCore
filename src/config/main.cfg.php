@@ -6,6 +6,6 @@ $aConfig = array(
     'project_email' => '',
 
     //default controller and method
-    'defaultController' => '',
-    'defaultMethod' => '',
+    'defaultController' => 'Dragon/controllers/Missing',
+    'defaultMethod' => 'index',
 );
