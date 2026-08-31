@@ -283,7 +283,7 @@ final class Router
         return null;
     }
 
-    private function match(string $path, string|int $mask, RouteTarget $route): ?RouteTarget
+    private function match(string $path, string $mask, RouteTarget $route): ?RouteTarget
     {
         // Capture token types in declaration order before replacing with regex patterns
         preg_match_all('/%[isd]/', $mask, $tokenMatches);
@@ -297,6 +297,7 @@ final class Router
 
         $pattern = '/^';
         $pattern .= str_replace('/', '\/', $mask);
+        $pattern .= str_ends_with($pattern, '\/') ? '?' : '\/?';
         $pattern .= '$/i';
 
         if (preg_match($pattern, $path, $vars)) {
