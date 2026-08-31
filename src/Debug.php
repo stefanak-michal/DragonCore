@@ -171,7 +171,7 @@ final class Debug
 
         $html = new View('/views/elements/debug/report', [
             'uri' => IS_CLI ? $GLOBALS['_SERVER']['SCRIPT_NAME'] : $_SERVER['REQUEST_URI'] ?? '',
-            'cm' => \Dragon\Application::$controller instanceof \Dragon\controllers\IController
+            'cm' => !IS_CLI && \Dragon\Application::$controller instanceof \Dragon\controllers\IController
                 ? get_class(\Dragon\Application::$controller) . '->' . \Dragon\Application::$method
                 : '',
             'time' => \DateTime::createFromFormat('U.u', sprintf('%.4f', $time))->format('Y-m-d H:i:s.u'),

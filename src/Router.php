@@ -46,7 +46,7 @@ final class Router
     {
         $this->loadRoutes();
 
-        $this->project_host = Config::gi()->get('project_host');
+        $this->project_host = Config::gi()->get('project_host', '');
         if (empty($this->project_host) && isset($_SERVER['SERVER_PORT'], $_SERVER['HTTP_HOST'])) {
             $this->project_host = ($_SERVER['SERVER_PORT'] == 443 ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'];
         }
