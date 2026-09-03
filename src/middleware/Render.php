@@ -2,6 +2,10 @@
 
 namespace Dragon\middleware;
 
+use Dragon\http\Request;
+use Dragon\http\Response;
+use Dragon\View;
+
 /**
  * Class Render
  * Renders the view after the controller action
@@ -12,12 +16,10 @@ namespace Dragon\middleware;
  */
 class Render implements IMiddleware
 {
-    public function handle(
-        \Dragon\http\Request $request,
-        \Dragon\http\Response $response,
-        callable $next,
-    ): \Dragon\http\Response {
-        $this->trySetView();
+    public function handle(Request $request, Response $response, callable $next,): Response {
+        if (empty(View::gi()->getView())) {
+            $this->trySetView();
+        }
 
         $response = $next($response);
 
@@ -27,7 +29,7 @@ class Render implements IMiddleware
             $response
                 ->status(203)
                 ->header('Location', '')
-                ->html(new \Dragon\View('/views/elements/debug/backtrace', [
+                ->html(new View('/views/elements/debug/backtrace', [
                     'bt' => debug_backtrace(),
                     'url' => $uri,
                     'code' => $code,
@@ -35,7 +37,7 @@ class Render implements IMiddleware
             return $response;
         }
 
-        $content = \Dragon\View::gi()->render();
+        $content = View::gi()->render();
         $pos = strrpos($content, '</body>');
         if (DRAGON_DEBUG && $pos !== false) {
             $content = substr_replace($content, \Dragon\Debug::onsite(), $pos, 0);
@@ -48,6 +50,10 @@ class Render implements IMiddleware
      */
     private function trySetView(): void
     {
+        if (!isset(\Dragon\Application::$controller, \Dragon\Application::$method)) {
+            return;
+        }
+
         $controller = ltrim(str_replace('\\', '/', \Dragon\Application::$controller::class), '/');
 
         $possibleViewFile = [
