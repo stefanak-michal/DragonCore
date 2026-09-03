@@ -15,28 +15,21 @@ class Assets
     /**
      * Type css
      */
-    const TYPE_CSS = 'css';
+    const string TYPE_CSS = 'css';
     /**
      * Type js
      */
-    const TYPE_JS = 'js';
+    const string TYPE_JS = 'js';
 
     /**
      * Assets to load on page
-     *
-     * @var array
      */
-    private static $toLoad = array();
-
-    /**
-     * @var bool
-     */
-    private static $absoluteUrls = true;
+    private static array $toLoad = array();
 
     /**
      * Reset list of assets to load
      */
-    public static function reset()
+    public static function reset(): void
     {
         self::$toLoad = array();
     }
@@ -45,7 +38,7 @@ class Assets
      * Add assets to load
      * @param string ...$names relative path to css/js asset file in assets directory
      */
-    public static function add(...$names)
+    public static function add(...$names): void
     {
         foreach ($names as $name) {
             $type = pathinfo($name, PATHINFO_EXTENSION);
@@ -69,7 +62,7 @@ class Assets
      * Remove assets from load
      * @param string ...$names relative path to css/js asset file in assets directory
      */
-    public static function remove(string ...$names)
+    public static function remove(string ...$names): void
     {
         foreach ($names as $name) {
             $type = pathinfo($name, PATHINFO_EXTENSION);
@@ -87,16 +80,24 @@ class Assets
      */
     public static function generateUrl(string $name): string
     {
-        if (!file_exists(APP_PATH . DS . 'assets' . DS . str_replace(['/', '\\'], DS, $name))) {
+        $possiblePaths = [
+            APP_PATH . DS . str_replace(['/', '\\'], DS, $name),
+            dirname(get_included_files()[0]) . DS . str_replace(['/', '\\'], DS, $name),
+            CORE_PATH . DS . str_replace(['/', '\\'], DS, $name),
+            APP_PATH . DS . 'assets' . DS . str_replace(['/', '\\'], DS, $name),
+            dirname(get_included_files()[0]) . DS . 'assets' . DS . str_replace(['/', '\\'], DS, $name),
+            CORE_PATH . DS . 'assets' . DS . str_replace(['/', '\\'], DS, $name),
+        ];
+
+        $key = array_find_key($possiblePaths, function (string $path) {
+            return file_exists($path);
+        });
+
+        if ($key === null) {
             return '';
         }
 
-        $output = '';
-        if (self::$absoluteUrls) {
-            $output = \Dragon\Router::gi()->getHost();
-        }
-        $output .= 'assets/' . $name . '?v=' . filemtime(APP_PATH . DS . 'assets' . DS . $name);
-        return $output;
+        return \Dragon\Router::gi()->getHost() . ($key > 2 ? 'assets/' : '') . $name . '?v=' . filemtime($possiblePaths[$key]);
     }
 
     /**
@@ -115,7 +116,7 @@ class Assets
         }
         if (!empty(self::$toLoad[self::TYPE_JS])) {
             foreach (self::$toLoad[self::TYPE_JS] as $file) {
-                $output[] = '<script type="text/javascript" src="' . $file . '" ></script>';
+                $output[] = '<script src="' . $file . '" ></script>';
             }
         }
 
