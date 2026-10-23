@@ -1,7 +1,10 @@
 <?php
 
+namespace Tests;
+
 use PHPUnit\Framework\TestCase;
 use Dragon\Config;
+use ReflectionClass;
 
 /**
  * ConfigTest

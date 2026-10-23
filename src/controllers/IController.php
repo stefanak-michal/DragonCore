@@ -13,10 +13,4 @@ use Dragon\middleware\IMiddleware;
  */
 interface IController
 {
-    /**
-     * Return the middleware stack to be executed around the controller method
-     *
-     * @return IMiddleware[]
-     */
-    public function middleware(): array;
 }

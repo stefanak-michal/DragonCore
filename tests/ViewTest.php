@@ -1,7 +1,10 @@
 <?php
 
+namespace Tests;
+
 use Dragon\View;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
 /**
  * ViewTest

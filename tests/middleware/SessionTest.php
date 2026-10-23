@@ -1,5 +1,7 @@
 <?php
 
+namespace Tests\middleware;
+
 use Dragon\http\Request;
 use Dragon\http\Response;
 use Dragon\middleware\Session;

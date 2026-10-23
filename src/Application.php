@@ -9,6 +9,10 @@ use Dragon\http\RequestMethod;
 use Dragon\http\Response;
 use Dragon\middleware\IMiddleware;
 use Dragon\middleware\RequiresMiddleware;
+use ReflectionAttribute;
+use ReflectionClass;
+use ReflectionMethod;
+use RuntimeException;
 
 /**
  * Application
@@ -64,96 +68,108 @@ final class Application
     public function run(): void
     {
         $target = Router::gi()->resolve();
-
-        if (DRAGON_DEBUG) {
-            header('X-Dragon-Debug: ' . Router::gi()->getHost() . 'tmp/debug/last.html');
-        }
+        $this->validateTarget($target);
 
         $request = new Request($target->vars);
         $response = new Response();
-        $this->loadController($target);
+
+        if (DRAGON_DEBUG) {
+            $response->header('X-Dragon-Debug', Router::gi()->getHost() . 'tmp/debug/last.html');
+        }
 
         if (!empty($target->verbs) && !in_array($request->method, $target->verbs, true)) {
             $response
                 ->status(405)
-                ->header('Allow', implode(', ', array_map(fn (RequestMethod $verb) => $verb->value, $target->verbs)))
+                ->header('Allow', implode(', ', array_map(fn(RequestMethod $verb) => $verb->value, $target->verbs)))
                 ->send();
             return;
         }
 
-        $middlewares = method_exists(self::$controller, 'middleware') ? self::$controller->middleware() : [];
-        $this->validateMiddlewareDependencies($middlewares);
-
-        $action = function (Response $response) use ($request) {
-            if (method_exists(self::$controller, self::$method)) {
-                Debug::timer('Controller');
-                $response = self::$controller->{self::$method}($request, $response);
-                Debug::timer('Controller');
-            }
-            return $response;
-        };
-
-        $pipeline = array_reduce(
-            array_reverse($middlewares),
-            function (callable $carry, IMiddleware $middleware) use ($request) {
-                return function (Response $response) use ($middleware, $carry, $request) {
-                    return $middleware->handle($request, $response, $carry);
-                };
-            },
-            $action,
-        );
-
-        $response = $pipeline($response);
-        $response->send();
+        $refClass = new ReflectionClass($target->controller);
+        $actions = $refClass->getAttributes(IMiddleware::class, ReflectionAttribute::IS_INSTANCEOF);
+        $actions[] = '--controller--';
+        $refMethod = new ReflectionMethod($target->controller, $target->method);
+        $actions = array_merge($actions, $refMethod->getAttributes(IMiddleware::class, ReflectionAttribute::IS_INSTANCEOF));
+        $actions[] = '--method--';
+        $this->executePipeline($request, $response, array_unique($actions), $target);
     }
 
-    private function loadController(RouteTarget $target): void
+    private function validateTarget(RouteTarget $target): void
     {
         if (empty($target->controller) or empty($target->method)) {
-            throw new \RuntimeException('Route resolved to empty controller or method');
+            throw new RuntimeException('Route resolved to empty controller or method');
         }
-
         if (!class_exists($target->controller)) {
-            throw new \RuntimeException("Controller class {$target->controller} not found");
+            throw new RuntimeException("Controller class {$target->controller} not found");
         }
-
-        self::$method = $target->method;
-        self::$controller = new $target->controller();
-
-        if (!method_exists(self::$controller, $target->method)) {
-            throw new \RuntimeException("Method {$target->method} not found in controller {$target->controller}");
+        if (!method_exists($target->controller, $target->method)) {
+            throw new RuntimeException("Controller method {$target->controller}->{$target->method} not found");
         }
     }
 
     /**
-     * Validate that middleware dependencies declared via #[RequiresMiddleware]
-     * are satisfied and ordered correctly in the stack.
-     *
-     * @param IMiddleware[] $middlewares
-     * @throws \RuntimeException
+     * @param <ReflectionAttribute|IMiddleware|string>[] $actions
      */
-    private function validateMiddlewareDependencies(array $middlewares): void
+    private function executePipeline(Request $request, Response $response, array $actions, RouteTarget $target): void
     {
-        foreach ($middlewares as $index => $middleware) {
-            $ref = new \ReflectionClass($middleware);
-            $attributes = $ref->getAttributes(RequiresMiddleware::class);
+        $executedMiddlewares = [];
 
-            foreach ($attributes as $attribute) {
-                $required = $attribute->newInstance()->middleware;
+        $executeNextInPipeline = function (Response $response) use (
+            &$executeNextInPipeline,
+            &$actions,
+            $request,
+            $target,
+            &$executedMiddlewares
+        ): Response {
+            $nextAction = array_shift($actions);
+            if ($nextAction === '--controller--') {
+                self::$controller = new $target->controller();
+                self::$method = $target->method;
 
-                $found = false;
-                for ($i = 0; $i < $index; $i++) {
-                    if ($middlewares[$i] instanceof $required) {
-                        $found = true;
-                        break;
+                if (method_exists(self::$controller, 'middleware')) {
+                    foreach (array_reverse(self::$controller->middleware()) as $middleware) {
+                        if (
+                            $middleware instanceof IMiddleware
+                            && !in_array($middleware, $actions)
+                            && !in_array($middleware::class, $executedMiddlewares)
+                        ) {
+                            array_unshift($actions, $middleware);
+                        }
                     }
                 }
 
-                if (!$found) {
-                    throw new \RuntimeException(
-                        get_class($middleware) . ' requires ' . $required . ' to be registered before it',
-                    );
+                return $executeNextInPipeline($response);
+            }
+            if ($nextAction === '--method--') {
+                return self::$controller->{self::$method}($request, $response);
+            }
+            if ($nextAction instanceof ReflectionAttribute) {
+                $middleware = $nextAction->newInstance();
+                if ($middleware instanceof IMiddleware) {
+                    $this->validateMiddlewareDependencies($nextAction->getName(), $executedMiddlewares);
+                    $executedMiddlewares[] = $nextAction->getName();
+                    return $middleware->handle($request, $response, $executeNextInPipeline);
                 }
+            }
+            if ($nextAction instanceof IMiddleware) {
+                $this->validateMiddlewareDependencies($nextAction::class, $executedMiddlewares);
+                $executedMiddlewares[] = $nextAction::class;
+                return $nextAction->handle($request, $response, $executeNextInPipeline);
+            }
+            throw new RuntimeException("Action {$nextAction} not found");
+        };
+
+        $response = $executeNextInPipeline($response);
+        $response->send();
+    }
+
+    private function validateMiddlewareDependencies(string $middleware, array $executedMiddlewares): void
+    {
+        $ref = new ReflectionClass($middleware);
+        foreach ($ref->getAttributes(RequiresMiddleware::class) as $attr) {
+            $required = $attr->newInstance()->middleware;
+            if (!in_array($required, $executedMiddlewares, true)) {
+                throw new RuntimeException($middleware . ' requires ' . $required . ' to be called before it');
             }
         }
     }

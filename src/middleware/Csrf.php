@@ -2,6 +2,8 @@
 
 namespace Dragon\middleware;
 
+use Attribute;
+
 /**
  * Class Csrf
  * Validates CSRF token on state-changing requests (POST, PUT, PATCH, DELETE).
@@ -12,6 +14,7 @@ namespace Dragon\middleware;
  * @author Michal Stefanak
  * @link https://github.com/stefanak-michal/DragonCore
  */
+#[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_METHOD)]
 #[RequiresMiddleware(Session::class)]
 class Csrf implements IMiddleware
 {

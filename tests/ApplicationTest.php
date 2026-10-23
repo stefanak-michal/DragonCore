@@ -1,97 +1,77 @@
 <?php
 
-namespace controllers {
+namespace Tests;
 
-    use Dragon\controllers\IController;
-    use Dragon\http\Request;
-    use Dragon\http\Response;
+use Dragon\Application;
+use Dragon\Config;
+use Dragon\Router;
+use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
-    class AppTestHome implements IController
+/**
+ * ApplicationTest
+ *
+ * @author Michal Stefanak
+ * @link https://github.com/stefanak-michal/DragonCore
+ */
+class ApplicationTest extends TestCase
+{
+    private array $serverBackup;
+
+    public static function setUpBeforeClass(): void
     {
-        public function middleware(): array
-        {
-            return [];
+        if (!defined('DS')) {
+            define('DS', DIRECTORY_SEPARATOR);
+        }
+        if (!defined('CORE_PATH')) {
+            define('CORE_PATH', dirname(__DIR__) . DS . 'src');
+        }
+        if (!defined('APP_PATH')) {
+            define('APP_PATH', __DIR__);
+        }
+        if (!defined('DRAGON_DEBUG')) {
+            define('DRAGON_DEBUG', false);
         }
 
-        public function index(Request $request, Response $response): Response
-        {
-            return $response->body('hello from app test');
-        }
+        $ref = new ReflectionClass(Router::class);
+        $ref->getProperty('instance')->setValue(null, null);
+
+        $ref = new ReflectionClass(Config::class);
+        $ref->getProperty('instance')->setValue(null, null);
     }
-}
 
-namespace {
-
-    use Dragon\Application;
-    use Dragon\Config;
-    use Dragon\Router;
-    use PHPUnit\Framework\TestCase;
-
-    /**
-     * ApplicationTest
-     *
-     * @author Michal Stefanak
-     * @link https://github.com/stefanak-michal/DragonCore
-     */
-    class ApplicationTest extends TestCase
+    protected function setUp(): void
     {
-        private array $serverBackup;
+        parent::setUp();
 
-        public static function setUpBeforeClass(): void
-        {
-            if (!defined('DS')) {
-                define('DS', DIRECTORY_SEPARATOR);
-            }
-            if (!defined('CORE_PATH')) {
-                define('CORE_PATH', dirname(__DIR__) . DS . 'src');
-            }
-            if (!defined('APP_PATH')) {
-                define('APP_PATH', __DIR__);
-            }
-            if (!defined('DRAGON_DEBUG')) {
-                define('DRAGON_DEBUG', false);
-            }
+        $this->serverBackup = $_SERVER;
 
-            $ref = new ReflectionClass(Router::class);
-            $ref->getProperty('instance')->setValue(null, null);
+        $_SERVER['SERVER_PORT'] = 80;
+        $_SERVER['HTTP_HOST'] = 'example.test';
+        $_SERVER['SERVER_NAME'] = 'example.test';
+        $_SERVER['REQUEST_URI'] = '/';
 
-            $ref = new ReflectionClass(Config::class);
-            $ref->getProperty('instance')->setValue(null, null);
-        }
+        Config::gi()->set('project_host', 'http://example.test');
+        Config::gi()->set('defaultController', 'Tests/support/controllers/AppTestHome');
+        Config::gi()->set('defaultMethod', 'index');
+        Config::gi()->set('routes', []);
+    }
 
-        protected function setUp(): void
-        {
-            parent::setUp();
+    protected function tearDown(): void
+    {
+        $_SERVER = $this->serverBackup;
 
-            $this->serverBackup = $_SERVER;
+        parent::tearDown();
+    }
 
-            $_SERVER['SERVER_PORT'] = 80;
-            $_SERVER['HTTP_HOST'] = 'example.test';
-            $_SERVER['SERVER_NAME'] = 'example.test';
-            $_SERVER['REQUEST_URI'] = '/';
+    public function testRun(): void
+    {
+        ob_start();
+        new Application()->run();
+        $output = ob_get_clean();
 
-            Config::gi()->set('project_host', 'http://example.test');
-            Config::gi()->set('defaultController', 'controllers/AppTestHome');
-            Config::gi()->set('defaultMethod', 'index');
-            Config::gi()->set('routes', []);
-        }
-
-        protected function tearDown(): void
-        {
-            $_SERVER = $this->serverBackup;
-
-            parent::tearDown();
-        }
-
-        public function testRun(): void
-        {
-            ob_start();
-            (new Application())->run();
-            $output = ob_get_clean();
-
-            $this->assertSame('hello from app test', $output);
-            $this->assertEquals('controllers\AppTestHome', Application::$controller::class);
-            $this->assertEquals('index', Application::$method);
-        }
+        $this->assertSame('hello from app test', $output);
+        $this->assertEquals('Tests\support\controllers\AppTestHome', Application::$controller::class);
+        $this->assertEquals('index', Application::$method);
     }
 }

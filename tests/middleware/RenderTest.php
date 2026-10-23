@@ -1,267 +1,247 @@
 <?php
 
-namespace controllers {
+namespace Tests\middleware;
 
-    use Dragon\http\Request;
-    use Dragon\http\Response;
-    use Dragon\controllers\IController;
+use Dragon\Application;
+use Dragon\http\Request;
+use Dragon\http\Response;
+use Dragon\middleware\Render;
+use Dragon\View;
+use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
-    class HomeCtrl implements IController
+/**
+ * RenderTest
+ *
+ * @author Michal Stefanak
+ * @link https://github.com/stefanak-michal/DragonCore
+ */
+class RenderTest extends TestCase
+{
+    private static string $viewsDir;
+
+    private array $serverBackup;
+
+    public static function setUpBeforeClass(): void
     {
-        public function middleware(): array
-        {
-            return [];
+        if (!defined('DS')) {
+            define('DS', DIRECTORY_SEPARATOR);
+        }
+        if (!defined('CORE_PATH')) {
+            define('CORE_PATH', dirname(__DIR__, 2) . DS . 'src');
+        }
+        if (!defined('APP_PATH')) {
+            define('APP_PATH', dirname(__DIR__));
+        }
+        if (!defined('DRAGON_DEBUG')) {
+            define('DRAGON_DEBUG', false);
         }
 
-        public function myAction(Request $request, Response $response): Response
-        {
-            return $response;
-        }
+        self::$viewsDir = APP_PATH . DS . 'views';
     }
-}
 
-namespace {
+    protected function setUp(): void
+    {
+        parent::setUp();
 
-    use Dragon\Application;
-    use Dragon\http\Request;
-    use Dragon\http\Response;
-    use Dragon\middleware\Render;
-    use Dragon\View;
-    use PHPUnit\Framework\TestCase;
+        $this->serverBackup = $_SERVER;
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $_SERVER['REQUEST_URI'] = '/';
+
+        $ref = new ReflectionClass(View::class);
+        $ref->getProperty('instance')->setValue(null, null);
+        View::$afterRender = null;
+
+        Application::$controller = new \Tests\support\controllers\HomeCtrl();
+        Application::$method = 'myAction';
+
+        $this->removeDirectory(self::$viewsDir);
+    }
+
+    protected function tearDown(): void
+    {
+        $this->removeDirectory(self::$viewsDir);
+        $_SERVER = $this->serverBackup;
+
+        parent::tearDown();
+    }
+
+    private function removeDirectory(string $dir): void
+    {
+        if (!file_exists($dir)) {
+            return;
+        }
+        $files = array_diff(scandir($dir), array('.', '..'));
+        foreach ($files as $file) {
+            (is_dir("$dir/$file")) ? $this->removeDirectory("$dir/$file") : unlink("$dir/$file");
+        }
+        rmdir($dir);
+    }
 
     /**
-     * RenderTest
-     *
-     * @author Michal Stefanak
-     * @link https://github.com/stefanak-michal/DragonCore
+     * Creates a view file at the given path relative to the views directory,
+     * tracking it for cleanup in tearDown.
      */
-    class RenderTest extends TestCase
+    private function createViewFile(string $relativePath, string $content = 'view content'): void
     {
-        private static string $viewsDir;
+        $fullPath = self::$viewsDir . DS . str_replace('/', DS, $relativePath) . '.phtml';
+        $dir = dirname($fullPath);
+        mkdir($dir, 0777, true);
 
-        private array $serverBackup;
+        file_put_contents($fullPath, $content);
+    }
 
-        public static function setUpBeforeClass(): void
-        {
-            if (!defined('DS')) {
-                define('DS', DIRECTORY_SEPARATOR);
-            }
-            if (!defined('CORE_PATH')) {
-                define('CORE_PATH', dirname(__DIR__, 2) . DS . 'src');
-            }
-            if (!defined('APP_PATH')) {
-                define('APP_PATH', dirname(__DIR__));
-            }
-            if (!defined('DRAGON_DEBUG')) {
-                define('DRAGON_DEBUG', false);
-            }
+    private function makeNext(): callable
+    {
+        return function (Response $response): Response {
+            return $response;
+        };
+    }
 
-            self::$viewsDir = APP_PATH . DS . 'views';
-        }
+    // -------------------------------------------------------------------------
+    // handle() — core behaviour
+    // -------------------------------------------------------------------------
 
-        protected function setUp(): void
-        {
-            parent::setUp();
+    public function testHandleCallsNext(): void
+    {
+        $nextCalled = false;
+        $next = function (Response $response) use (&$nextCalled): Response {
+            $nextCalled = true;
+            return $response;
+        };
 
-            $this->serverBackup = $_SERVER;
-            $_SERVER['REQUEST_METHOD'] = 'GET';
-            $_SERVER['REQUEST_URI'] = '/';
+        (new Render())->handle(new Request(), new Response(), $next);
 
-            $ref = new ReflectionClass(View::class);
-            $ref->getProperty('instance')->setValue(null, null);
-            View::$afterRender = null;
+        $this->assertTrue($nextCalled);
+    }
 
-            Application::$controller = new \controllers\HomeCtrl();
-            Application::$method = 'myAction';
+    public function testHandleSetsContentTypeToHtml(): void
+    {
+        $response = (new Render())->handle(new Request(), new Response(), $this->makeNext());
 
-            $this->removeDirectory(self::$viewsDir);
-        }
+        $this->assertSame('text/html', $response->getHeaders()['Content-Type']);
+    }
 
-        protected function tearDown(): void
-        {
-            $this->removeDirectory(self::$viewsDir);
-            $_SERVER = $this->serverBackup;
+    public function testHandleReturnsViewContent(): void
+    {
+        $this->createViewFile('tests/support/controllers/HomeCtrl/myAction', 'hello from view');
 
-            parent::tearDown();
-        }
+        $response = (new Render())->handle(new Request(), new Response(), $this->makeNext());
 
-        private function removeDirectory(string $dir): void
-        {
-            if (!file_exists($dir)) {
-                return;
-            }
-            $files = array_diff(scandir($dir), array('.', '..'));
-            foreach ($files as $file) {
-                (is_dir("$dir/$file")) ? $this->removeDirectory("$dir/$file") : unlink("$dir/$file");
-            }
-            rmdir($dir);
-        }
+        $this->assertSame('hello from view', $response->getBody());
+    }
 
-        /**
-         * Creates a view file at the given path relative to the views directory,
-         * tracking it for cleanup in tearDown.
-         */
-        private function createViewFile(string $relativePath, string $content = 'view content'): void
-        {
-            $fullPath = self::$viewsDir . DS . str_replace('/', DS, $relativePath) . '.phtml';
-            $dir = dirname($fullPath);
-            mkdir($dir, 0777, true);
+    public function testHandleWithNoMatchingViewRendersEmptyBody(): void
+    {
+        $response = (new Render())->handle(new Request(), new Response(), $this->makeNext());
 
-            file_put_contents($fullPath, $content);
-        }
+        $this->assertSame('', $response->getBody());
+    }
 
-        private function makeNext(): callable
-        {
-            return function (Response $response): Response {
-                return $response;
-            };
-        }
+    public function testHandleCallsNextBeforeRendering(): void
+    {
+        $order = [];
+        $this->createViewFile('tests/support/controllers/HomeCtrl/myAction', 'view');
 
-        // -------------------------------------------------------------------------
-        // handle() — core behaviour
-        // -------------------------------------------------------------------------
+        View::$afterRender = function (string $file, string $content) use (&$order): string {
+            $order[] = 'render';
+            return $content;
+        };
 
-        public function testHandleCallsNext(): void
-        {
-            $nextCalled = false;
-            $next = function (Response $response) use (&$nextCalled): Response {
-                $nextCalled = true;
-                return $response;
-            };
+        $next = function (Response $response) use (&$order): Response {
+            $order[] = 'next';
+            return $response;
+        };
 
-            (new Render())->handle(new Request(), new Response(), $next);
+        (new Render())->handle(new Request(), new Response(), $next);
 
-            $this->assertTrue($nextCalled);
-        }
+        $this->assertSame(['next', 'render'], $order);
+    }
 
-        public function testHandleSetsContentTypeToHtml(): void
-        {
-            $response = (new Render())->handle(new Request(), new Response(), $this->makeNext());
+    public function testHandleUsesResponseReturnedByNext(): void
+    {
+        $customResponse = new Response();
+        $next = fn(Response $response): Response => $customResponse;
 
-            $this->assertSame('text/html', $response->getHeaders()['Content-Type']);
-        }
+        $result = (new Render())->handle(new Request(), new Response(), $next);
 
-        public function testHandleReturnsViewContent(): void
-        {
-            $this->createViewFile('controllers/HomeCtrl/myAction', 'hello from view');
+        $this->assertSame($customResponse, $result);
+    }
 
-            $response = (new Render())->handle(new Request(), new Response(), $this->makeNext());
+    public function testHandleDoesNotInjectDebugWhenNotWorkspace(): void
+    {
+        $this->createViewFile('tests/support/controllers/HomeCtrl/myAction', '<html><body><p>content</p></body></html>');
 
-            $this->assertSame('hello from view', $response->getBody());
-        }
+        $response = (new Render())->handle(new Request(), new Response(), $this->makeNext());
 
-        public function testHandleWithNoMatchingViewRendersEmptyBody(): void
-        {
-            $response = (new Render())->handle(new Request(), new Response(), $this->makeNext());
+        $this->assertSame('<html><body><p>content</p></body></html>', $response->getBody());
+    }
 
-            $this->assertSame('', $response->getBody());
-        }
+    // -------------------------------------------------------------------------
+    // trySetView() — path resolution variants
+    // -------------------------------------------------------------------------
 
-        public function testHandleCallsNextBeforeRendering(): void
-        {
-            $order = [];
-            $this->createViewFile('controllers/HomeCtrl/myAction', 'view');
+    public function testTrySetViewMatchesExactCasePath(): void
+    {
+        $this->createViewFile('Tests/support/controllers/HomeCtrl/myAction', 'exact case');
 
-            View::$afterRender = function (string $file, string $content) use (&$order): string {
-                $order[] = 'render';
-                return $content;
-            };
+        $response = (new Render())->handle(new Request(), new Response(), $this->makeNext());
 
-            $next = function (Response $response) use (&$order): Response {
-                $order[] = 'next';
-                return $response;
-            };
+        $this->assertSame('exact case', $response->getBody());
+    }
 
-            (new Render())->handle(new Request(), new Response(), $next);
+    public function testTrySetViewMatchesLowercaseControllerPath(): void
+    {
+        $this->createViewFile('tests/support/controllers/homectrl/myAction', 'lowercase controller');
 
-            $this->assertSame(['next', 'render'], $order);
-        }
+        $response = (new Render())->handle(new Request(), new Response(), $this->makeNext());
 
-        public function testHandleUsesResponseReturnedByNext(): void
-        {
-            $customResponse = new Response();
-            $next = fn(Response $response): Response => $customResponse;
+        $this->assertSame('lowercase controller', $response->getBody());
+    }
 
-            $result = (new Render())->handle(new Request(), new Response(), $next);
+    public function testTrySetViewMatchesFullLowercasePath(): void
+    {
+        $this->createViewFile('tests/support/controllers/homectrl/myaction', 'full lowercase');
 
-            $this->assertSame($customResponse, $result);
-        }
+        $response = (new Render())->handle(new Request(), new Response(), $this->makeNext());
 
-        public function testHandleDoesNotInjectDebugWhenNotWorkspace(): void
-        {
-            $this->createViewFile('controllers/HomeCtrl/myAction', '<html><body><p>content</p></body></html>');
+        $this->assertSame('full lowercase', $response->getBody());
+    }
 
-            $response = (new Render())->handle(new Request(), new Response(), $this->makeNext());
+    public function testTrySetViewMatchesSnakeCaseControllerPath(): void
+    {
+        $this->createViewFile('tests/support/controllers/home_ctrl/myAction', 'snake_case controller');
 
-            $this->assertSame('<html><body><p>content</p></body></html>', $response->getBody());
-        }
+        $response = (new Render())->handle(new Request(), new Response(), $this->makeNext());
 
-        // -------------------------------------------------------------------------
-        // trySetView() — path resolution variants
-        // -------------------------------------------------------------------------
+        $this->assertSame('snake_case controller', $response->getBody());
+    }
 
-        public function testTrySetViewMatchesExactCasePath(): void
-        {
-            $this->createViewFile('controllers/HomeCtrl/myAction', 'exact case');
+    public function testTrySetViewMatchesSnakeCaseLowercaseMethodPath(): void
+    {
+        $this->createViewFile('tests/support/controllers/home_ctrl/myaction', 'snake_case controller lowercase method');
 
-            $response = (new Render())->handle(new Request(), new Response(), $this->makeNext());
+        $response = (new Render())->handle(new Request(), new Response(), $this->makeNext());
 
-            $this->assertSame('exact case', $response->getBody());
-        }
+        $this->assertSame('snake_case controller lowercase method', $response->getBody());
+    }
 
-        public function testTrySetViewMatchesLowercaseControllerPath(): void
-        {
-            $this->createViewFile('controllers/homectrl/myAction', 'lowercase controller');
+    public function testTrySetViewMatchesFullSnakeCasePath(): void
+    {
+        $this->createViewFile('tests/support/controllers/home_ctrl/my_action', 'full snake_case');
 
-            $response = (new Render())->handle(new Request(), new Response(), $this->makeNext());
+        $response = (new Render())->handle(new Request(), new Response(), $this->makeNext());
 
-            $this->assertSame('lowercase controller', $response->getBody());
-        }
+        $this->assertSame('full snake_case', $response->getBody());
+    }
 
-        public function testTrySetViewMatchesFullLowercasePath(): void
-        {
-            $this->createViewFile('controllers/homectrl/myaction', 'full lowercase');
+    public function testTrySetViewUsesFirstMatchingPath(): void
+    {
+        $this->createViewFile('Tests/support/controllers/HomeCtrl/myAction', 'first match');
+        $this->createViewFile('tests/support/controllers/home_ctrl/my_action', 'last match');
 
-            $response = (new Render())->handle(new Request(), new Response(), $this->makeNext());
+        $response = (new Render())->handle(new Request(), new Response(), $this->makeNext());
 
-            $this->assertSame('full lowercase', $response->getBody());
-        }
-
-        public function testTrySetViewMatchesSnakeCaseControllerPath(): void
-        {
-            $this->createViewFile('controllers/home_ctrl/myAction', 'snake_case controller');
-
-            $response = (new Render())->handle(new Request(), new Response(), $this->makeNext());
-
-            $this->assertSame('snake_case controller', $response->getBody());
-        }
-
-        public function testTrySetViewMatchesSnakeCaseLowercaseMethodPath(): void
-        {
-            $this->createViewFile('controllers/home_ctrl/myaction', 'snake_case controller lowercase method');
-
-            $response = (new Render())->handle(new Request(), new Response(), $this->makeNext());
-
-            $this->assertSame('snake_case controller lowercase method', $response->getBody());
-        }
-
-        public function testTrySetViewMatchesFullSnakeCasePath(): void
-        {
-            $this->createViewFile('controllers/home_ctrl/my_action', 'full snake_case');
-
-            $response = (new Render())->handle(new Request(), new Response(), $this->makeNext());
-
-            $this->assertSame('full snake_case', $response->getBody());
-        }
-
-        public function testTrySetViewUsesFirstMatchingPath(): void
-        {
-            $this->createViewFile('controllers/HomeCtrl/myAction', 'first match');
-            $this->createViewFile('controllers/home_ctrl/my_action', 'last match');
-
-            $response = (new Render())->handle(new Request(), new Response(), $this->makeNext());
-
-            $this->assertSame('first match', $response->getBody());
-        }
+        $this->assertSame('first match', $response->getBody());
     }
 }

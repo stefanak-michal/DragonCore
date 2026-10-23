@@ -1,5 +1,7 @@
 <?php
 
+namespace Tests\middleware;
+
 use Dragon\http\Request;
 use Dragon\http\Response;
 use Dragon\middleware\Cors;
@@ -71,7 +73,7 @@ class CorsTest extends TestCase
         $response = $cors->handle(new Request(), new Response(), $this->makeNext());
 
         $this->assertSame(
-            'Content-Type, Authorization',
+            'Content-Type, Authorization, X-Requested-With, X-CSRF-Token',
             $response->getHeaders()['Access-Control-Allow-Headers']
         );
     }
@@ -91,7 +93,9 @@ class CorsTest extends TestCase
     public function testCustomAllowedOrigin(): void
     {
         $cors = new Cors(allowedOrigin: 'https://example.com');
-        $response = $cors->handle(new Request(), new Response(), $this->makeNext());
+        $request = new Request();
+        $request->headers['Origin'] = 'https://example.com';
+        $response = $cors->handle($request, new Response(), $this->makeNext());
 
         $this->assertSame('https://example.com', $response->getHeaders()['Access-Control-Allow-Origin']);
     }
@@ -151,7 +155,9 @@ class CorsTest extends TestCase
     {
         $_SERVER['REQUEST_METHOD'] = 'OPTIONS';
         $cors = new Cors(allowedOrigin: 'https://example.com');
-        $response = $cors->handle(new Request(), new Response(), $this->makeNext());
+        $request = new Request();
+        $request->headers['Origin'] = 'https://example.com';
+        $response = $cors->handle($request, new Response(), $this->makeNext());
 
         $this->assertSame('https://example.com', $response->getHeaders()['Access-Control-Allow-Origin']);
         $this->assertArrayHasKey('Access-Control-Allow-Methods', $response->getHeaders());
