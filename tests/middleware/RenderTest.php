@@ -128,7 +128,7 @@ class RenderTest extends TestCase
 
     public function testHandleReturnsViewContent(): void
     {
-        $this->createViewFile('tests/support/controllers/HomeCtrl/myAction', 'hello from view');
+        $this->createViewFile('Tests/support/controllers/HomeCtrl/myAction', 'hello from view');
 
         $response = (new Render())->handle(new Request(), new Response(), $this->makeNext());
 
@@ -145,7 +145,7 @@ class RenderTest extends TestCase
     public function testHandleCallsNextBeforeRendering(): void
     {
         $order = [];
-        $this->createViewFile('tests/support/controllers/HomeCtrl/myAction', 'view');
+        $this->createViewFile('Tests/support/controllers/HomeCtrl/myAction', 'view');
 
         View::$afterRender = function (string $file, string $content) use (&$order): string {
             $order[] = 'render';
@@ -174,7 +174,7 @@ class RenderTest extends TestCase
 
     public function testHandleDoesNotInjectDebugWhenNotWorkspace(): void
     {
-        $this->createViewFile('tests/support/controllers/HomeCtrl/myAction', '<html><body><p>content</p></body></html>');
+        $this->createViewFile('Tests/support/controllers/HomeCtrl/myAction', '<html><body><p>content</p></body></html>');
 
         $response = (new Render())->handle(new Request(), new Response(), $this->makeNext());
 
