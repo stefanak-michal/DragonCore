@@ -14,6 +14,12 @@ To render html tags with registered assets, you can place in `<head>` in layout 
 <?= \Dragon\helpers\Assets::draw() ?>
 ```
 
+## Image url
+
+When you need image url (for ex. `<img src="" />`), you can use method `generateUrl()`.
+
+This method accepts relative path and try multiple locations to find requested file. It also adds extra GET parameter for versioning based of last file modification time.
+
 ## Versioning
 
 System is automatically putting file update time as a version of it. There is no need to manually update or specify it.

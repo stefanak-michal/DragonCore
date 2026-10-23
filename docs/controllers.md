@@ -13,14 +13,14 @@ use Dragon\controllers\IController;
 
 class Homepage implements IController
 {
-    public function middleware(): array
-    {
-        return [];
-    }
 }
 ```
 
-The `middleware()` method returns the middleware stack that wraps the controller action. Middleware is optional, but if you use it, it is executed in the order returned by this method. See [middleware](middleware.md).
+## Middleware method (optional)
+
+Controller can contain `public function middleware(): array` method which has to return the middleware stack that wraps requested method. Middleware is optional, but if you use it, it is executed in the order returned by this method. See [middleware](middleware.md).
+
+**It is preferred to use middleware as attributes.**
 
 ## Action method signature
 
@@ -83,6 +83,7 @@ use Dragon\middleware\Render;
 
 class Homepage implements IController
 {
+    #[Render]
     public function index(Request $request, Response $response): Response
     {
         $name = $request->input('name', 'guest');
@@ -101,20 +102,13 @@ class Homepage implements IController
             'ajax' => $request->isAjax(),
         ]);
     }
-
-    public function middleware(): array
-    {
-        return [
-            new Render(),
-        ];
-    }
 }
 ```
 
 In this example:
 
 - `index()` reads input from the request, prepares view data, and returns the modified response.
-- `Render` middleware runs around the controller action and converts the view into the final HTML response.
+- `Render` middleware runs around the method action and converts the view into the final HTML response.
 - `apiUser()` returns JSON directly, so it does not need view rendering logic in the action itself.
 
 ## Default controller and method

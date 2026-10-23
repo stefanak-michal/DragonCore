@@ -1,7 +1,12 @@
 <?php
 
+namespace Tests;
+
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\TestCase;
 use Dragon\Config;
+use ReflectionClass;
 
 /**
  * ConfigTest
@@ -9,6 +14,8 @@ use Dragon\Config;
  * @author Michal Stefanak
  * @link https://github.com/stefanak-michal/DragonCore
  */
+#[RunTestsInSeparateProcesses]
+#[PreserveGlobalState(false)]
 class ConfigTest extends TestCase
 {
     public static function setUpBeforeClass(): void

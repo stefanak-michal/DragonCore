@@ -2,6 +2,8 @@
 
 namespace Dragon\middleware;
 
+use Attribute;
+
 /**
  * Class Cors
  * Handles Cross-Origin Resource Sharing headers.
@@ -11,6 +13,7 @@ namespace Dragon\middleware;
  * @author Michal Stefanak
  * @link https://github.com/stefanak-michal/DragonCore
  */
+#[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_METHOD)]
 readonly class Cors implements IMiddleware
 {
     /**

@@ -10,34 +10,40 @@ Calling `$next()` passes control to the next middleware in the stack, or to the 
 
 ## Registering middleware
 
-Controllers declare their middleware stack by implementing `\Dragon\controllers\IController`:
+Preferred way is to use middleware as attribute on the class or on the method.
+
+Another option is add method `public function middleware(): array` into controller and it has to return array of middleware instances, each implementing `IMiddleware` interface. 
+
+Execution flow when application `run()` is called is following:
+
+1. Middlewares set via controller attributes. 
+2. Instantiating controller (which means that __construct is called).
+3. Middlewares returned by `middleware()` method if it's defined.
+4. Middlewares set via method attributes.
+
+Even if a middleware is defined in the pipeline multiple times, it's called only once (on the first occurence).
+
+## Example
 
 ```php
 use Dragon\controllers\IController;
 use Dragon\http\Request;
 use Dragon\http\Response;
 
+#[Session]
 class Homepage implements IController
 {
+    #[Render]
     public function index(Request $request, Response $response): Response
     {
         \Dragon\View::gi()->set('msg', 'Hello!');
 
         return $response;
     }
-
-    public function middleware(): array
-    {
-        return [
-            new \Dragon\middleware\Render()
-        ];
-    }
 }
 ```
 
-_Middleware is executed in the order it is returned._
-
-The same `Request` and `Response` objects are passed through the middleware chain and into the controller action. Middleware can inspect request data before the action runs and can also modify the response returned by the controller.
+The same `Request` and `Response` objects are passed through the pipeline into the controller action. Middleware can inspect request data before the action runs and can also modify the response returned by the controller.
 
 ## Middleware dependency
 

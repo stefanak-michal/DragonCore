@@ -5,6 +5,7 @@ namespace Dragon\middleware;
 use Dragon\http\Request;
 use Dragon\http\Response;
 use Dragon\View;
+use Attribute;
 
 /**
  * Class Render
@@ -14,13 +15,10 @@ use Dragon\View;
  * @author Michal Stefanak
  * @link https://github.com/stefanak-michal/DragonCore
  */
+#[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_METHOD)]
 class Render implements IMiddleware
 {
     public function handle(Request $request, Response $response, callable $next,): Response {
-        if (empty(View::gi()->getView())) {
-            $this->trySetView();
-        }
-
         $response = $next($response);
 
         $code = $response->getStatus();
@@ -35,6 +33,10 @@ class Render implements IMiddleware
                     'code' => $code,
                     ])->render());
             return $response;
+        }
+
+        if (empty(View::gi()->getView())) {
+            $this->trySetView();
         }
 
         $content = View::gi()->render();

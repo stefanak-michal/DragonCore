@@ -8,7 +8,7 @@ on:
 jobs:
   phpunit-2204:
     if: ${{ github.event.pull_request.draft == false }}
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     name: "Running Tests for PHP ${{ matrix.php-version }}"
     strategy:
       fail-fast: false
@@ -17,7 +17,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
