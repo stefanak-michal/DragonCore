@@ -1,7 +1,12 @@
 <?php
 
+namespace Tests\http;
+
 use Dragon\http\Response;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 /**
  * ResponseTest
@@ -9,6 +14,8 @@ use PHPUnit\Framework\TestCase;
  * @author Michal Stefanak
  * @link https://github.com/stefanak-michal/DragonCore
  */
+#[RunTestsInSeparateProcesses]
+#[PreserveGlobalState(false)]
 class ResponseTest extends TestCase
 {
     public static function setUpBeforeClass(): void

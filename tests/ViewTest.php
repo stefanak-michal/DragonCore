@@ -3,6 +3,8 @@
 namespace Tests;
 
 use Dragon\View;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
@@ -12,6 +14,8 @@ use ReflectionClass;
  * @author Michal Stefanak
  * @link https://github.com/stefanak-michal/DragonCore
  */
+#[RunTestsInSeparateProcesses]
+#[PreserveGlobalState(false)]
 class ViewTest extends TestCase
 {
     private static string $viewsDir;

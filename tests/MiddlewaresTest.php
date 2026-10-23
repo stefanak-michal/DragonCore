@@ -4,8 +4,18 @@ namespace Tests;
 
 use Dragon\Application;
 use Dragon\Config;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * MiddlewaresTest
+ *
+ * @author Michal Stefanak
+ * @link https://github.com/stefanak-michal/DragonCore
+ */
+#[RunTestsInSeparateProcesses]
+#[PreserveGlobalState(false)]
 class MiddlewaresTest extends TestCase
 {
     private array $serverBackup;

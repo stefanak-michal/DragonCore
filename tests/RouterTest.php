@@ -6,6 +6,8 @@ use Dragon\Config;
 use Dragon\helpers\RouteTarget;
 use Dragon\http\RequestMethod;
 use Dragon\Router;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
@@ -15,6 +17,8 @@ use ReflectionClass;
  * @author Michal Stefanak
  * @link https://github.com/stefanak-michal/DragonCore
  */
+#[RunTestsInSeparateProcesses]
+#[PreserveGlobalState(false)]
 class RouterTest extends TestCase
 {
     private array $serverBackup;

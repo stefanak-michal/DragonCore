@@ -7,6 +7,8 @@ use Dragon\http\Request;
 use Dragon\http\Response;
 use Dragon\middleware\Render;
 use Dragon\View;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
@@ -16,6 +18,8 @@ use ReflectionClass;
  * @author Michal Stefanak
  * @link https://github.com/stefanak-michal/DragonCore
  */
+#[RunTestsInSeparateProcesses]
+#[PreserveGlobalState(false)]
 class RenderTest extends TestCase
 {
     private static string $viewsDir;

@@ -8,11 +8,6 @@ use Dragon\controllers\IController;
 
 class HomeCtrl implements IController
 {
-    public function middleware(): array
-    {
-        return [];
-    }
-
     public function myAction(Request $request, Response $response): Response
     {
         return $response;

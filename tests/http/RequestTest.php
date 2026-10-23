@@ -1,7 +1,11 @@
 <?php
 
+namespace Tests\http;
+
 use Dragon\http\Request;
 use Dragon\http\RequestMethod;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -10,6 +14,8 @@ use PHPUnit\Framework\TestCase;
  * @author Michal Stefanak
  * @link https://github.com/stefanak-michal/DragonCore
  */
+#[RunTestsInSeparateProcesses]
+#[PreserveGlobalState(false)]
 class RequestTest extends TestCase
 {
     private array $serverBackup;
