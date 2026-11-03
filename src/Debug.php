@@ -257,7 +257,7 @@ final class Debug
                 continue;
             }
 
-            if ($key === 'files') {
+            if ($key === 'file') {
                 usort($table, function ($a, $b) {
                     return $a['file'] <=> $b['file'];
                 });
