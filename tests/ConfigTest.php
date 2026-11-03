@@ -44,7 +44,7 @@ class ConfigTest extends TestCase
     public function testGet(): void
     {
         //This way we verify that the default config file is loaded and accessible
-        $this->assertEquals('Dragon Core', Config::gi()->get('project_title'));
+        $this->assertEquals('Dragon Core', Config::gi()->get(Config::PROJECT_TITLE));
     }
 
     public function testSetGet(): void

@@ -47,9 +47,9 @@ class MiddlewaresTest extends TestCase
         $_SERVER['SERVER_NAME'] = 'example.test';
         $_SERVER['REQUEST_URI'] = '/';
 
-        Config::gi()->set('project_host', 'http://example.test');
-        Config::gi()->set('defaultMethod', 'index');
-        Config::gi()->set('routes', []);
+        Config::gi()->set(Config::PROJECT_HOST, 'http://example.test');
+        Config::gi()->set(Config::DEFAULT_METHOD, 'index');
+        Config::gi()->set(Config::ROUTES, []);
     }
 
     protected function tearDown(): void
@@ -62,7 +62,7 @@ class MiddlewaresTest extends TestCase
 
     public function testControllerWithClassAndMethodAttribute(): void
     {
-        Config::gi()->set('defaultController', 'Tests/support/controllers/ControllerWithClassAndMethodAttribute');
+        Config::gi()->set(Config::DEFAULT_CONTROLLER, 'Tests/support/controllers/ControllerWithClassAndMethodAttribute');
 
         ob_start();
         new Application()->run();
@@ -78,7 +78,7 @@ class MiddlewaresTest extends TestCase
 
     public function testControllerWithClassAttribute(): void
     {
-        Config::gi()->set('defaultController', 'Tests/support/controllers/ControllerWithClassAttribute');
+        Config::gi()->set(Config::DEFAULT_CONTROLLER, 'Tests/support/controllers/ControllerWithClassAttribute');
 
         ob_start();
         new Application()->run();
@@ -93,7 +93,7 @@ class MiddlewaresTest extends TestCase
 
     public function testControllerWithMiddlewareDuplicate(): void
     {
-        Config::gi()->set('defaultController', 'Tests/support/controllers/ControllerWithMiddlewareDuplicate');
+        Config::gi()->set(Config::DEFAULT_CONTROLLER, 'Tests/support/controllers/ControllerWithMiddlewareDuplicate');
 
         ob_start();
         new Application()->run();
@@ -108,7 +108,7 @@ class MiddlewaresTest extends TestCase
 
     public function testControllerWithMiddlewareMethod(): void
     {
-        Config::gi()->set('defaultController', 'Tests/support/controllers/ControllerWithMiddlewareMethod');
+        Config::gi()->set(Config::DEFAULT_CONTROLLER, 'Tests/support/controllers/ControllerWithMiddlewareMethod');
 
         ob_start();
         new Application()->run();
@@ -122,7 +122,7 @@ class MiddlewaresTest extends TestCase
 
     public function testControllerWithMiddlewareMethodAndClassAttribute(): void
     {
-        Config::gi()->set('defaultController', 'Tests/support/controllers/ControllerWithMiddlewareMethodAndClassAttribute');
+        Config::gi()->set(Config::DEFAULT_CONTROLLER, 'Tests/support/controllers/ControllerWithMiddlewareMethodAndClassAttribute');
 
         ob_start();
         new Application()->run();

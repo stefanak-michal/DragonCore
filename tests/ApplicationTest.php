@@ -55,10 +55,10 @@ class ApplicationTest extends TestCase
         $_SERVER['SERVER_NAME'] = 'example.test';
         $_SERVER['REQUEST_URI'] = '/';
 
-        Config::gi()->set('project_host', 'http://example.test');
-        Config::gi()->set('defaultController', 'Tests/support/controllers/AppTestHome');
-        Config::gi()->set('defaultMethod', 'index');
-        Config::gi()->set('routes', []);
+        Config::gi()->set(Config::PROJECT_HOST, 'http://example.test');
+        Config::gi()->set(Config::DEFAULT_CONTROLLER, 'Tests/support/controllers/AppTestHome');
+        Config::gi()->set(Config::DEFAULT_METHOD, 'index');
+        Config::gi()->set(Config::ROUTES, []);
     }
 
     protected function tearDown(): void

@@ -231,8 +231,8 @@ class Email
                 $mailer->setFrom(...$this->from);
             } else {
                 $mailer->setFrom(
-                    \Dragon\Config::gi()->get('project_email'),
-                    \Dragon\Config::gi()->get('project_title'),
+                    \Dragon\Config::gi()->get(\Dragon\Config::PROJECT_EMAIL),
+                    \Dragon\Config::gi()->get(\Dragon\Config::PROJECT_TITLE),
                 );
             }
 

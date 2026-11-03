@@ -46,7 +46,7 @@ final class Router
     {
         $this->loadRoutes();
 
-        $this->project_host = Config::gi()->get('project_host', '');
+        $this->project_host = Config::gi()->get(Config::PROJECT_HOST, '');
         if (empty($this->project_host) && isset($_SERVER['SERVER_PORT'], $_SERVER['HTTP_HOST'])) {
             $this->project_host = ($_SERVER['SERVER_PORT'] == 443 ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'];
         }
@@ -57,7 +57,7 @@ final class Router
             trigger_error('Not specified project host', E_USER_WARNING);
         }
         $this->project_host = rtrim($this->project_host, '/');
-        Config::gi()->set('project_host', $this->project_host);
+        Config::gi()->set(Config::PROJECT_HOST, $this->project_host);
     }
 
     /**
@@ -66,7 +66,7 @@ final class Router
     private function loadRoutes(): void
     {
         $this->routes = [];
-        $this->loadRoutesRecursive(Config::gi()->get('routes', []), '');
+        $this->loadRoutesRecursive(Config::gi()->get(Config::ROUTES, []), '');
     }
 
     /**
@@ -121,8 +121,8 @@ final class Router
         }
 
         return new RouteTarget(
-            Config::gi()->get('defaultController'),
-            Config::gi()->get('defaultMethod'),
+            Config::gi()->get(Config::DEFAULT_CONTROLLER),
+            Config::gi()->get(Config::DEFAULT_METHOD),
         );
     }
 
@@ -291,7 +291,7 @@ final class Router
 
         $mask = str_replace(
             ['%i', '%s', '%d'],
-            ['(-?\d+)', '(' . Config::gi()->get('routeStringRegex', '[\w\-]+') . ')', '(-?[\d\.]+)'],
+            ['(-?\d+)', '(' . Config::gi()->get(Config::ROUTE_STRING_REGEX, '[\w\-]+') . ')', '(-?[\d\.]+)'],
             $mask,
         );
 

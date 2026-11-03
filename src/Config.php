@@ -12,38 +12,37 @@ namespace Dragon;
  */
 final class Config
 {
+    public const string PROJECT_HOST = 'project_host';
+    public const string PROJECT_EMAIL = 'project_email';
+    public const string PROJECT_TITLE = 'project_title';
+    public const string ROUTES = 'routes';
+    public const string ROUTE_STRING_REGEX = 'routeStringRegex';
+    public const string DEFAULT_CONTROLLER = 'defaultController';
+    public const string DEFAULT_METHOD = 'defaultMethod';
+    public const string VIEWS_EXTENSION = 'viewsExtension';
+    public const string VIEWS_DIRECTORY = 'viewsDirectory';
+
     /**
      * Array of all config variables
-     *
-     * @var array
      */
-    private $configVars = array();
+    private array $configVars = [];
 
     /**
      * Array of lookup tables
-     *
-     * @var array
      */
-    private $lookUpTables = array();
+    private array $lookUpTables = [];
 
     /**
      * Lookuptable file affix
-     *
-     * @var string
      */
-    public static $ltAffix = '.lt.php';
+    public static string $ltAffix = '.lt.php';
 
     /**
      * Config file affix
-     *
-     * @var string
      */
-    public static $cfgAffix = '.cfg.php';
+    public static string $cfgAffix = '.cfg.php';
 
-    /**
-     * @var Config
-     */
-    private static $instance;
+    private static ?Config $instance = null;
 
     /**
      * Singleton
@@ -85,11 +84,8 @@ final class Config
 
     /**
      * Set config parameter
-     *
-     * @param string $key
-     * @param mixed $value
      */
-    public function set(string $key, $value)
+    public function set(string $key, mixed $value): void
     {
         if (!empty($key)) {
             if (!empty($value)) {
@@ -102,12 +98,8 @@ final class Config
 
     /**
      * Read config parameter
-     *
-     * @param string $key
-     * @param mixed $default
-     * @return mixed
      */
-    public function get(string $key, $default = null)
+    public function get(string $key, mixed $default = null): mixed
     {
         $output = $default;
 
@@ -120,11 +112,8 @@ final class Config
 
     /**
      * Read lookup table value
-     *
-     * @param string $dotSeparatedKeys
-     * @return mixed
      */
-    public function lt(string $dotSeparatedKeys)
+    public function lt(string $dotSeparatedKeys): mixed
     {
         if (empty($dotSeparatedKeys)) {
             return null;
@@ -147,9 +136,6 @@ final class Config
 
     /**
      * Load lookup table file
-     *
-     * @param string $filepath
-     * @return bool
      */
     public function loadLookupTable(string $filepath): bool
     {
@@ -170,9 +156,6 @@ final class Config
 
     /**
      * Load config file
-     *
-     * @param string $filepath
-     * @return bool
      */
     public function loadConfig(string $filepath): bool
     {
@@ -196,7 +179,7 @@ final class Config
      * @param string $configKey
      * @param $object
      */
-    public static function apply(string $configKey, $object)
+    public static function apply(string $configKey, $object): void
     {
         $c = self::gi()->get($configKey);
         if (!empty($c) && is_array($c)) {

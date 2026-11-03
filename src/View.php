@@ -15,23 +15,11 @@ namespace Dragon;
  */
 final class View
 {
-    /**
-     * @var ?string
-     */
-    private $view;
-    /**
-     * @var ?string
-     */
-    private $layout;
-    /**
-     * @var array
-     */
-    private $vars = [];
+    private ?string $view = null;
+    private ?string $layout = null;
+    private array $vars = [];
 
-    /**
-     * @var View
-     */
-    private static $instance;
+    private static ?View $instance = null;
 
     /**
      * Call after any render (view or layout). It should return modified content.
@@ -115,7 +103,7 @@ final class View
      * @param mixed $value
      * @return View
      */
-    public function set(string $key, $value): View
+    public function set(string $key, mixed $value): View
     {
         $this->vars[$key] = $value;
         return $this;
@@ -208,12 +196,12 @@ final class View
         }
 
         $str = str_replace(array('/', "\\"), DS, $str);
-        $ext = '.' . ltrim(Config::gi()->get('viewsExtension', 'phtml'), '.');
+        $ext = '.' . ltrim(Config::gi()->get(Config::VIEWS_EXTENSION, 'phtml'), '.');
         if (substr($str, 0, -strlen($ext)) != $ext) {
             $str .= $ext;
         }
 
-        $viewDirectory = trim(str_replace(array('/', "\\"), DS, Config::gi()->get('viewsDirectory', 'views')), DS);
+        $viewDirectory = trim(str_replace(array('/', "\\"), DS, Config::gi()->get(Config::VIEWS_DIRECTORY, 'views')), DS);
 
         if (substr($str, 0, 1) == DS) {
             $output = APP_PATH . $str;

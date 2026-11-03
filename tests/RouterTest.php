@@ -56,10 +56,10 @@ class RouterTest extends TestCase
         $_SERVER['SERVER_NAME'] = 'example.test';
         $_SERVER['REQUEST_URI'] = '/';
 
-        Config::gi()->set('project_host', 'http://example.test');
-        Config::gi()->set('defaultController', 'Tests\support\controllers\RouterTestHome');
-        Config::gi()->set('defaultMethod', 'index');
-        Config::gi()->set('routes', []);
+        Config::gi()->set(Config::PROJECT_HOST, 'http://example.test');
+        Config::gi()->set(Config::DEFAULT_CONTROLLER, 'Tests\support\controllers\RouterTestHome');
+        Config::gi()->set(Config::DEFAULT_METHOD, 'index');
+        Config::gi()->set(Config::ROUTES, []);
 
         $ref = new ReflectionClass(Router::class);
         $ref->getProperty('instance')->setValue(null, null);
@@ -99,7 +99,7 @@ class RouterTest extends TestCase
 
     public function testSetSecureHostToFalse(): void
     {
-        Config::gi()->set('project_host', 'https://example.test');
+        Config::gi()->set(Config::PROJECT_HOST, 'https://example.test');
 
         $router = Router::gi();
         $router->setSecureHost(false);
@@ -138,7 +138,7 @@ class RouterTest extends TestCase
 
     public function testUrlWithIntMask(): void
     {
-        Config::gi()->set('routes', [
+        Config::gi()->set(Config::ROUTES, [
             '/user/%i/profile' => 'Tests/support/controllers/RouterTestHome/profile',
         ]);
 
@@ -148,7 +148,7 @@ class RouterTest extends TestCase
 
     public function testUrlWithStringMask(): void
     {
-        Config::gi()->set('routes', [
+        Config::gi()->set(Config::ROUTES, [
             '/post/%s/view' => 'Tests/support/controllers/RouterTestHome/view',
         ]);
 
@@ -158,7 +158,7 @@ class RouterTest extends TestCase
 
     public function testUrlWithFloatMask(): void
     {
-        Config::gi()->set('routes', [
+        Config::gi()->set(Config::ROUTES, [
             '/price/%d' => 'Tests/support/controllers/RouterTestHome/list',
         ]);
 
@@ -174,7 +174,7 @@ class RouterTest extends TestCase
 
     public function testUrlVarCountMismatchFallsBack(): void
     {
-        Config::gi()->set('routes', [
+        Config::gi()->set(Config::ROUTES, [
             '/user/%i/profile' => 'Tests/support/controllers/RouterTestHome/profile',
         ]);
 
@@ -186,7 +186,7 @@ class RouterTest extends TestCase
 
     public function testFindRouteSimple(): void
     {
-        Config::gi()->set('routes', [
+        Config::gi()->set(Config::ROUTES, [
             '/about' => 'Tests/support/controllers/RouterTestHome/about',
         ]);
 
@@ -199,7 +199,7 @@ class RouterTest extends TestCase
 
     public function testFindRouteWithInt(): void
     {
-        Config::gi()->set('routes', [
+        Config::gi()->set(Config::ROUTES, [
             '/user/%i' => 'Tests/support/controllers/RouterTestHome/show',
         ]);
 
@@ -211,7 +211,7 @@ class RouterTest extends TestCase
 
     public function testFindRouteWithString(): void
     {
-        Config::gi()->set('routes', [
+        Config::gi()->set(Config::ROUTES, [
             '/post/%s' => 'Tests/support/controllers/RouterTestHome/view',
         ]);
 
@@ -223,7 +223,7 @@ class RouterTest extends TestCase
 
     public function testFindRouteWithFloat(): void
     {
-        Config::gi()->set('routes', [
+        Config::gi()->set(Config::ROUTES, [
             '/price/%d' => 'Tests/support/controllers/RouterTestHome/list',
         ]);
 
@@ -235,7 +235,7 @@ class RouterTest extends TestCase
 
     public function testFindRouteWithMultipleVars(): void
     {
-        Config::gi()->set('routes', [
+        Config::gi()->set(Config::ROUTES, [
             '/category/%s/item/%i' => 'Tests/support/controllers/RouterTestHome/show',
         ]);
 
@@ -246,7 +246,7 @@ class RouterTest extends TestCase
 
     public function testFindRouteNoMatch(): void
     {
-        Config::gi()->set('routes', [
+        Config::gi()->set(Config::ROUTES, [
             '/home' => 'Tests/support/controllers/RouterTestHome/index',
         ]);
 
@@ -256,7 +256,7 @@ class RouterTest extends TestCase
 
     public function testFindRouteIsCaseInsensitive(): void
     {
-        Config::gi()->set('routes', [
+        Config::gi()->set(Config::ROUTES, [
             '/About' => 'Tests/support/controllers/RouterTestHome/about',
         ]);
 
@@ -278,7 +278,7 @@ class RouterTest extends TestCase
 
     public function testResolveWithMatchedRoute(): void
     {
-        Config::gi()->set('routes', [
+        Config::gi()->set(Config::ROUTES, [
             '/about' => 'Tests/support/controllers/RouterTestHome/about',
         ]);
 
@@ -289,7 +289,7 @@ class RouterTest extends TestCase
 
     public function testResolveWithRouteVars(): void
     {
-        Config::gi()->set('routes', [
+        Config::gi()->set(Config::ROUTES, [
             '/user/%i' => 'Tests/support/controllers/RouterTestHome/show',
         ]);
 
@@ -301,7 +301,7 @@ class RouterTest extends TestCase
 
     public function testResolveStripsQueryString(): void
     {
-        Config::gi()->set('routes', [
+        Config::gi()->set(Config::ROUTES, [
             '/about' => 'Tests/support/controllers/RouterTestHome/about',
         ]);
 
@@ -312,7 +312,7 @@ class RouterTest extends TestCase
 
     public function testFindRouteWithRouteTargetValue(): void
     {
-        Config::gi()->set('routes', [
+        Config::gi()->set(Config::ROUTES, [
             '/about' => new RouteTarget('Tests/support/controllers/RouterTestHome', 'about', [RequestMethod::GET]),
         ]);
 
@@ -325,7 +325,7 @@ class RouterTest extends TestCase
 
     public function testControllerGroupingFillsRouteTargetController(): void
     {
-        Config::gi()->set('routes', [
+        Config::gi()->set(Config::ROUTES, [
             'Tests/support/controllers/RouterTestHome' => [
                 '/about' => new RouteTarget(method: 'about', verbs: [RequestMethod::POST]),
             ],
@@ -385,7 +385,7 @@ class RouterTest extends TestCase
 
     public function testRoutesControllerGrouping(): void
     {
-        Config::gi()->set('routes', [
+        Config::gi()->set(Config::ROUTES, [
             'Tests/support/controllers/RouterTestHome' => [
                 '/login' => 'login',
                 '/logout' => 'logout',
@@ -402,7 +402,7 @@ class RouterTest extends TestCase
 
     public function testRoutesPrefixGrouping(): void
     {
-        Config::gi()->set('routes', [
+        Config::gi()->set(Config::ROUTES, [
             '/api' => [
                 '/foo' => 'Tests/support/controllers/RouterTestHome/foo',
             ]
@@ -418,7 +418,7 @@ class RouterTest extends TestCase
 
     public function testRoutesPrefixGroupingWithinControllerGrouping(): void
     {
-        Config::gi()->set('routes', [
+        Config::gi()->set(Config::ROUTES, [
             'Tests/support/controllers/RouterTestHome' => [
                 '/api' => [
                     '/foo' => 'foo',
@@ -436,7 +436,7 @@ class RouterTest extends TestCase
 
     public function testControllerGroupingWithinPrefixGrouping(): void
     {
-        Config::gi()->set('routes', [
+        Config::gi()->set(Config::ROUTES, [
             '/api' => [
                 'Tests/support/controllers/RouterTestHome' => [
                     '/foo' => 'foo'
@@ -454,7 +454,7 @@ class RouterTest extends TestCase
 
     public function testControllerGroupingWithinControllerGrouping(): void
     {
-        Config::gi()->set('routes', [
+        Config::gi()->set(Config::ROUTES, [
             'controllers/Foo' => [
                 '/foo' => 'foo',
                 'controllers/Bar' => [
