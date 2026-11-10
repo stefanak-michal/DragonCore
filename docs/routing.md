@@ -2,7 +2,7 @@
 
 ## Configuration
 
-Routing works with specification in config with key "routes", it is good practice to place it in `/config/routes.cfg.php`. It is an array of url masks with target controller and method. You can also group multiple routes by uri prefix or by controller.
+Routing works with specification in config with key `\Dragon\Config::ROUTES`, it is good practice to place it in `/config/routes.cfg.php`. It is an array of url masks with target controller and method. You can also group multiple routes by uri prefix or by controller.
 
 ## How does it work
 
@@ -19,7 +19,7 @@ Available placeholders are:
 
 ```php
 $aConfig = [
-    'routes' => [
+    \Dragon\Config::ROUTES => [
           '/' => 'controllers/Homepage/index',
 
           // Mask to target: <project_host>/course/6-some-title -> controllers\Homepage->course(int $i, string $s)
@@ -48,7 +48,7 @@ $aConfig = [
 
 ## String placeholder
 
-To read string from url with placeholder `%s` it uses a default regular expression `[\w\-]+`. You can specify own with config key `routeStringRegex`.
+To read string from url with placeholder `%s` it uses a default regular expression `[\w\-]+`. You can specify own with config key `\Dragon\Config::ROUTE_STRING_REGEX`.
 
 ## RouteTarget
 
@@ -56,7 +56,7 @@ When you want to take route definition even further, you can use `\Dragon\helper
 
 ```php
 $aConfig = [
-    'routes' => [
+    \Dragon\Config::ROUTES => [
           '/course/%i-%s' => new \Dragon\helpers\RouteTarget('controllers/Homepage', 'course', [\Dragon\http\RequestMethod::GET]),
           'controllers/OtherController' => [
                '/do-something' => new \Dragon\helpers\RouteTarget(method: 'someMethod')
@@ -74,6 +74,6 @@ Default accepted HTTP method is only GET method (only when using RouteTarget cla
 
 To generate url (mask version based on route definition) you can call (ex.) `\Dragon\Router::gi()->url(Homepage::class, 'index');`.
 
-For homepage url you can use shortcut `\Dragon\Router::gi()->homepage();`. Homepage can be defined via config by setting key `project_host`, otherwise the Router will try to resolve it by itself by using $_SERVER variable.
+For homepage url you can use shortcut `\Dragon\Router::gi()->homepage();`. Homepage can be defined via config by setting key `\Dragon\Config::PROJECT_HOST`, otherwise the Router will try to resolve it by itself by using $_SERVER variable.
 
 To redirect user somewhere else you can call `\Dragon\http\Response::redirect();`. In debug mode redirecting shows custom page with more information about call.

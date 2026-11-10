@@ -2,10 +2,10 @@
 
 $aConfig = array(
     //title of project
-    'project_title' => 'Dragon Core',
-    'project_email' => '',
+    \Dragon\Config::PROJECT_TITLE => 'Dragon Core',
+    \Dragon\Config::PROJECT_EMAIL => '',
 
     //default controller and method
-    'defaultController' => 'Dragon/controllers/Missing',
-    'defaultMethod' => 'index',
+    \Dragon\Config::DEFAULT_CONTROLLER => 'Dragon/controllers/Missing',
+    \Dragon\Config::DEFAULT_METHOD => 'index',
 );

@@ -116,8 +116,8 @@ In this example:
 When you are in need to handle missing routes, you can add fallback controller to handle this requests. Add to your config file following keys:
 
 ```php
-'defaultController' => 'controllers/Homepage',
-'defaultMethod' => 'missing',
+\Dragon\Config::DEFAULT_CONTROLLER => 'controllers/Homepage',
+\Dragon\Config::DEFAULT_METHOD => 'missing',
 ```
 
 _Without this configuration opening missing route will end up throwing RuntimeException._

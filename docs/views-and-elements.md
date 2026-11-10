@@ -12,7 +12,7 @@ To render views and layouts you have to use `\Dragon\View` class. It has dual us
 
 In the description below is used _`<View>`_ because of two different options to access instance of this class.
 
-Default directory for view, layout and element files is `views`. You can change it in config through key `viewsDirectory`.
+Default directory for view, layout and element files is `views`. You can change it in config through key `\Dragon\Config::VIEWS_DIRECTORY`.
 
 Automatically view file is loaded like this:  
 `<root>/views/<controller>/<method>.phtml`

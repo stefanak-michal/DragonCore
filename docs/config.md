@@ -10,6 +10,17 @@ System is auto loading all files in config directory.
 
 Is available with singleton method `\Dragon\Config::gi()`.
 
+Predefined constants for configuration keys to use instead of strings:
+- `\Dragon\Config::PROJECT_HOST` (`'project_host'`)
+- `\Dragon\Config::PROJECT_EMAIL` (`'project_email'`)
+- `\Dragon\Config::PROJECT_TITLE` (`'project_title'`)
+- `\Dragon\Config::ROUTES` (`'routes'`)
+- `\Dragon\Config::ROUTE_STRING_REGEX` (`'routeStringRegex'`)
+- `\Dragon\Config::DEFAULT_CONTROLLER` (`'defaultController'`)
+- `\Dragon\Config::DEFAULT_METHOD` (`'defaultMethod'`)
+- `\Dragon\Config::VIEWS_EXTENSION` (`'viewsExtension'`)
+- `\Dragon\Config::VIEWS_DIRECTORY` (`'viewsDirectory'`)
+
 File extensions for config files can be changed on static properties:
 - cfgAffix - default `.cfg.php`
 - ltAffix - default `.lt.php`
