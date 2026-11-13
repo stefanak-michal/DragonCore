@@ -249,9 +249,8 @@ class Email
                 $mailer->addReplyTo($email, is_numeric($name) ? '' : $name);
             }
 
-            $mailer->isHTML(true);
             $mailer->Subject = $this->title;
-            $mailer->Body = $this->content;
+            $mailer->msgHTML($this->content);
 
             foreach ($this->attachments as $filename => [$type, $content]) {
                 $dot = strrpos($filename, '.');
